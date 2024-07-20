@@ -5,6 +5,10 @@ A program to produce a suite of images for boot screens, wallpapers, website ban
 
 ![desert-moonrise](https://01micko.github.io/artwork/desert-moonriseFHD.png)
 
+YT vid for mock *plymouth* animation
+
+[desert-moonrise MKIII](https://youtu.be/llRHfF6z-qM)
+
 ### still WIP
 
 This program should not be considered stable. While it shouldn't destroy anything
