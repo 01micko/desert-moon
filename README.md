@@ -3,7 +3,7 @@ A program to produce a suite of images for boot screens, wallpapers, website ban
 
 ### teaser
 
-![desert-moonrise](https://01micko.github.io/artwork/desert-moonriseFHD.svg)
+![desert-moonrise](https://01micko.github.io/artwork/desert-moonriseFHD.png)
 
 ### still WIP
 
@@ -50,6 +50,6 @@ Everything will be located in the subdir `ff`
 
 ### To Do
 
- [ ] code clean up
- [ ] manual page
- [ ] bug fixes
+ - [ ] code clean up
+ - [ ] manual page
+ - [ ] bug fixes
