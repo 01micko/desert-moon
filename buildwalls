@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -e
 NAME=desert-moonrise
 
 echo hello $USER
@@ -8,30 +8,34 @@ echo hello $USER
 rm -rf ff/
 mkdir -p ff/plymouth ff/walls
 
-./moonwall -x800 -y75 -d ff -L'debian 13'  -f 'font-logos 30' -l "$(printf "%b" "\\uf10a")" \
-  -j'240 6' -k'440 3' -F'Poppl-Laudatio 30' -n ${NAME}-installer -e80
-./moonwall -x1920 -y120 -d ff  -f 'font-logos 50' -l "$(printf "%b" "\\uf10a")" -k'680 -20' \
-  -n ${NAME}-banner -e46 -F'Poppl-Laudatio 40' -L "debian" -j'1100 -20'  -T"Poppl-Laudatio 20" \
-  -m"1224 -5"-Z"0.9 0.9 0.9 0.65" -t"the universal operating system"
-./moonwall -x720 -y340 -d ff  -f 'font-logos 50' -l "$(printf "%b" "\\uf10a")" -k'100 60' \
-  -n ${NAME}-wikibanner -e130 -F'Poppl-Laudatio 26' -L "debian 13" -j'280 140' \
-  -t"the universal operating system" -T"Poppl-Laudatio 20" -m"210 240" -Z"0.9 0.9 0.9 0.5"
-./moonwall -x720 -y340 -d ff  -f 'font-logos 50' -l "$(printf "%b" "\\uf10a")" -k'100 60' \
-  -n ${NAME}-blogbanner -e130 -F'Poppl-Laudatio 26' -L "debian 13" -j'280 140' \
-  -t"https://deb.li/trixie" -T"Poppl-Laudatio 20" -m"250 240" -Z"0.9 0.9 0.9 0.5"
-./moonwall -x600 -y600 -d ff  -f 'font-logos 60' -l "$(printf "%b" "\\uf10a")" -k'100 120' \
-  -n ${NAME}-dvdlabel -e100 -F'Poppl-Laudatio 36' -L "debian 13" -j'240 190' \
-  -t"the universal operating system" -T"Poppl-Laudatio 20" -m"180 460" -Z"0.9 0.9 0.9 0.5"
-./moonwall -x1920 -y1080 -d ff  -f 'font-logos 60' -l "$(printf "%b" "\\uf10a")" -k'1160 320' \
+./moonwall -x800 -y75 -d ff -L'debian 13'  -s'font-logos 30' -S "$(printf "%b" "\\uf10a")" \
+  -j'240 6' -k'440 3' -l'Poppl-Laudatio 30' -n ${NAME}-installer -e80
+./moonwall -x1920 -y120 -d ff  -s 'font-logos 50' -S "$(printf "%b" "\\uf10a")" -k'680 -20' \
+  -n ${NAME}-banner -e46 -l'Poppl-Laudatio 40' -L "debian" -j'1100 -20'  -t"Poppl-Laudatio 20" \
+  -m"1224 -5"-Z"0.9 0.9 0.9 0.65" -T"the universal operating system"
+./moonwall -x720 -y340 -d ff  -s 'font-logos 50' -S "$(printf "%b" "\\uf10a")" -k'100 60' \
+  -n ${NAME}-wikibanner -e130 -l'Poppl-Laudatio 26' -L "debian 13" -j'280 140' \
+  -T"the universal operating system" -t"Poppl-Laudatio 20" -m"210 240" -Z"0.9 0.9 0.9 0.5"
+./moonwall -x720 -y340 -d ff  -s 'font-logos 50' -S "$(printf "%b" "\\uf10a")" -k'100 60' \
+  -n ${NAME}-blogbanner -e130 -l'Poppl-Laudatio 26' -L "debian 13" -j'280 140' \
+  -T"https://deb.li/trixie" -t"Poppl-Laudatio 20" -m"250 240" -Z"0.9 0.9 0.9 0.5"
+./moonwall -x600 -y600 -d ff  -s 'font-logos 60' -S "$(printf "%b" "\\uf10a")" -k'100 120' \
+  -n ${NAME}-dvdlabel -e100 -l'Poppl-Laudatio 36' -L "debian 13" -j'240 190' \
+  -T"the universal operating system" -t"Poppl-Laudatio 20" -m"180 460" -Z"0.9 0.9 0.9 0.5"
+./moonwall -x1920 -y1080 -d ff  -s 'font-logos 60' -S "$(printf "%b" "\\uf10a")" -k'1160 320' \
   -n ${NAME}-login -e100 -L " " \
-  -t"debian" -T"Poppl-Laudatio 80" -m"460 900" -Z"0.9 0.9 0.9 0.5"
-./moonwall -x640 -y480 -d ff  -f 'font-logos 40' -l "$(printf "%b" "\\uf10a")" -k'460 120' \
-  -n ${NAME}-grubin -e100 -L " " \
-  -t"debian" -T"Poppl-Laudatio 22" -m"300 300" -Z"0.9 0.9 0.9 0.5" -p
-cat ff/${NAME}-grubin.png|pngtopnm|pnmquant 65536|pnmtopng > ff/${NAME}-grub.png
-./moonwall -x640 -y300 -f "font-logos 80" -dff -n baz77 -l "$(printf "%b" "\\uf10a")" -k'120 60' -L" " -p
-cat ff/baz77.png|pngtopnm|pnmquant 16|ppmtolss16 > ff/${NAME}.lss
-rm -f ff/baz77*png ff/${NAME}-grubin.png
+  -T"debian" -t"Poppl-Laudatio 80" -m"460 900" -Z"0.9 0.9 0.9 0.5"
+./moonwall -x640 -y480 -d ff  -s 'font-logos 40' -S "$(printf "%b" "\\uf10a")" -k'460 120' \
+  -n ${NAME}-grub-in -e100 -L " " \
+  -T"debian" -t"Poppl-Laudatio 22" -m"300 300" -Z"0.9 0.9 0.9 0.5" -p
+cat ff/${NAME}-grub-in.png|pngtopnm|pnmquant 65536|pnmtopng > ff/${NAME}-grub.png && echo ${NAME}-grub.png created || echo ${NAME}-grub.png failed
+./moonwall -x640 -y300 -s "font-logos 80" -dff -n ${NAME}-syslinux-in -S "$(printf "%b" "\\uf10a")" -k'120 60' -L" " -p
+cat ff/${NAME}-syslinux-in.png|pngtopnm|pnmquant 65536|pnmtopng > ff/${NAME}-syslinux.png && echo ${NAME}-syslinux.png created || echo ${NAME}-syslinux.png failed
+./moonwall -x640 -y300 -s "font-logos 80" -dff -n ${NAME}-isolinux-in -S "$(printf "%b" "\\uf10a")" -k'120 60' -L" " -p
+cat ff/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|ppmtolss16 > ff/${NAME}-isolinux.lss && echo ${NAME}-isolinux.lss created || echo ${NAME}-isolinux.lss failed
+cat ff/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|pnmtopng >  ff/${NAME}-isolinux.png
+rm -f ff/${NAME}-*-in.png
+
 for e in SXGA VGA wide FHD ; do
     echo $e
     case $e in
@@ -40,7 +44,7 @@ for e in SXGA VGA wide FHD ; do
 	wide)X=1920 Y=1200 K='500 400';;
 	 FHD)X=1920 Y=1080 K='400 400';;
     esac
-    ./moonwall -x $X -y $Y -f "font-logos 80" -n ${NAME}${e} -l "$(printf "%b" "\\uf10a")" -k"$K" -d ff/walls
+    ./moonwall -x $X -y $Y -s "font-logos 80" -n ${NAME}${e} -S "$(printf "%b" "\\uf10a")" -k"$K" -d ff/walls
 done
 
 x=1;
@@ -48,7 +52,7 @@ while [ $x -lt 200 ]; do
     n=''
     [ $x -lt 10 ] && n=00
     [ $x -lt 100 ] && [ $x -ge 10 ] && n=0
-   ./moonwall -x1920 -y1080 -f "font-logos 80" -n ${NAME}${n}${x} -l "$(printf "%b" "\\uf10a")" -k'300 400' -F'Poppl-Laudatio 60' -Ldebian -j'520 840' -e${x} -p -d ff/plymouth
+   ./moonwall -x1920 -y1080 -s "font-logos 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\uf10a")" -k'300 400' -l'Poppl-Laudatio 60' -Ldebian -j'520 840' -e${x} -p -d ff/plymouth
    x=$(($x + 1))
 done
 
@@ -65,7 +69,7 @@ done
 x=231
 q=10
 while [ $x -lt 281 ] ; do 
-    ./moonwall -x1920 -y1080 -f "font-logos 80" -n ${NAME}${n}${x} -l "$(printf "%b" "\\uf10a")" -k'300 400' -F'Poppl-Laudatio 60' -Ldebian -j'520 840' -e199 -t13 -T"Poppl-Laudatio 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -p -d ff/plymouth
+    ./moonwall -x1920 -y1080 -s "font-logos 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\uf10a")" -k'300 400' -l'Poppl-Laudatio 60' -Ldebian -j'520 840' -e199 -T13 -t"Poppl-Laudatio 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -p -d ff/plymouth
     x=$(($x + 1))
     q=$(($q + 1))
 done
@@ -74,6 +78,3 @@ done
 (cd ff/plymouth
 ffmpeg -framerate 16 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p ../${NAME}.mp4 -y
 )
-
-
-
