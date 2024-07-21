@@ -381,10 +381,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		double bm = 0.913;
 		double am = 0.980;
 		/* moon */
-		/*pat = cairo_pattern_create_radial ((0.5 * wdth) - wz, (0.2 * hght) - hz, 110,  (0.3 * wdth) - wz, (0.3 * hght) - hz, radii);
-		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.882, 0.749, 0.498, 0.8);
-		cairo_pattern_add_color_stop_rgba(pat, 0.8, 0.219, 0.278, 0.360, 0.8);
-		cairo_set_source(c, pat);*/
 		cairo_set_source_rgba(c, rm, gm, bm, am);
 		cairo_fill(c);
 		cairo_arc (c, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii, 0, M_PI * 2);
