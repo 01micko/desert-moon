@@ -121,7 +121,7 @@ The name is as it implies: creates a moon wallpaper.
 
 *-v*
 
-	how version and exit.
+	show version and exit.
 
 # AUTHOR
 
