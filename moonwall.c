@@ -31,26 +31,44 @@
 void usage() {
 	printf("%s-%s\n\n", PROG , THIS_VERSION);
 	printf("\tGenerate SVG or PNG Linux wallpapers.\n");
-	printf("\tThe name is as it implies: hard coded!\n\n");
+	printf("\tThe name is as it implies: creates a moon wallpaper!\n\n");
+	printf("\tThere are easter eggs included\n\n");
 	printf("Usage :\n");
-	printf("%s [-n,-f,-s,-i,-c,-x,-y,-d,-b,-h,-v,-a,-p]\n", PROG);
+	printf("%s [-L,-l,-S,-s,-T,-t,-n,-i,-c,-x,-y,-d,-b,-h,-v,-a,-p]\n", PROG);
 	printf("\t-n [string] image file name\n");
-	printf("\t-f [string] ttf font family - quoted if there are spaces\n");
-	printf("\t-s [int] font size\n");
+	printf("\t-d [/path/to/directory] destination directory: (default: $HOME)\n");
+	printf("\t-L [string] Main label on image - quoted if there are spaces\n");
+	printf("\t-S [string] Second label on image - quoted if there are spaces\n");
+	printf("\t-T [string] Third label on image - quoted if there are spaces\n");
+	printf("\t-l [string int] main ttf font family and size - quoted \n");
+	printf("\t-s [string int] second ttf font family and size- quoted \n");
+	printf("\t-t [string int] third ttf font family and size - quoted\n");
+	printf("\t-j [int: x y] main font position - quoted\n");
+	printf("\t-k [int: x y] second font position - quoted\n");
+	printf("\t-k [int: x y] third font position - quoted\n");
+	printf("\tNOTE: the main and secondary fonts are hidden behind the foreground.\n"
+		"\tThis is by design, and requests to change will not be considered.\n"
+		"\tIf you need text on the foreground, used the \"-T\", third font option.\n\n");
+	printf("\t-X [\"double double double double \"] floating point sRGBA, quoted,\n"
+		"\tspace delimited values for the main font color\n");
+	printf("\t-Y [\"double double double double \"] floating point sRGBA, quoted,\n"
+		"\tspace delimited values for the second font color\n");
+	printf("\t-Z [\"double double double double \"] floating point sRGBA, quoted,\n"
+		"\tspace delimited values for the main font color\n"
+		"\tColor arg example: -X \"0.1 0.2 0.3 0.4\"\n");
 	printf("\t-i [string int int] \"/path/to/icon.png x y\"\n");
-	printf("\t-e [int] factor for moonrise 0-100\n");
+	printf("\t-e [int] factor for moonrise 0-200, 100 is default\n");
 	printf("\t-c centres icon and/or text\n");
 	printf("\t-x [int] width of image in pixels\n");
 	printf("\t-y [int] height of image in pixels\n");
-	printf("\t-d [/path/to/directory] destination directory: (default: $HOME)\n");
 	printf("\t-r [int 0 - 2] 0 is default; prints the stars in a random pattern.\n"
 		"\t\t\"-r1\" uses the default config to place the stars.\n"
 		"\t\t\"-r2\" uses a random pattern but prints that to stdout\n"	
-		"\t\tNOTE: only works with \"-b1\" option as all stars are produced.\n");	
+		"\t\tNOTE: only works with \"-b0\" option as all stars are produced.\n");	
 	printf("\t-b [int 0 - 2] 0 is the default if \"-b\" is not specified\n");
-	printf("\t\t0 is a moon, 1 is a sun and 2 is an eclipse\n");
+	printf("\t\t0 is a moon, 1 and 2 - see what happens :^)\n");
 	printf("\t-p : save to PNG, SVG is the default.\n");
-	printf("\t-a : use a specified colour from the config for the foreground.\n");
+	printf("\t-a : use a specified color from the config for the foreground.\n");
 	printf("\t-h : show this help and exit.\n");
 	printf("\t-v : show version and exit.\n");
 	exit (EXIT_SUCCESS);
@@ -109,8 +127,50 @@ static PangoLayout *hlayout(const char *font, double f_size, cairo_t *c, int wdt
 	return layout;
 }
 
-void paint_img(char *label, const char *font, char *slabel, const char *sfont, char *tlabel, const char *tfont, char *jpos, char *kpos, char *mpos, const char *name, int wdth, int hght,
-		char *dest, int rnd, int flag, int aflag, int pflag, char *iconin, int centred, int efactor, char *xcol, char *ycol, char *zcol) {
+/*
+  * This snippet borrowed from qemu
+  * Copyright (C) Fabrice Bellard 2006-2017 GPL-2.0
+  * https://github.com/qemu/qemu/blob/master/util/cutils.c
+  * Replaces strncpy
+  */
+void pstrcpy(char *buf, int buf_size, const char *str) {
+	int c;
+	char *q = buf;
+
+	if (buf_size <= 0)
+		return;
+
+	for(;;) {
+		c = *str++;
+		if (c == 0 || q >= buf + buf_size - 1)
+			break;
+		*q++ = c;
+	}
+	*q = '\0';
+}
+
+
+
+int split(const char *original, int offset, char **s1, char **s2)
+{
+	int len;
+	len = strlen(original);
+	if(offset > len) {
+		return(0);
+	}
+	*s1 = (char *)malloc(sizeof(char) * offset + 1);
+	*s2 = (char *)malloc(sizeof(char) * len-offset + 1);
+	if((s1 == NULL) || (s2 == NULL)) {
+		return(0);
+	}
+	pstrcpy(*s1, offset + 1, original);
+	pstrcpy(*s2, len-offset + 1, original + offset);
+	return(1);
+}
+
+void paint_img(char *label, const char *font, char *slabel, const char *sfont, char *tlabel, const char *tfont,
+		char *jpos, char *kpos, char *mpos, const char *name, int wdth, int hght, char *dest, int rnd,
+		int flag, int aflag, int pflag, char *iconin, int centred, int efactor, char *xcol, char *ycol, char *zcol) {
 	char destimg[PATH_MAX];
 	double radii = 0.025 * wdth;
 	const char *fp_color = "0.505 0.317 0.215";
@@ -318,15 +378,20 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			}
 		}
 
+		double rm = 0.835;
+		double gm = 0.870;
+		double bm = 0.913;
+		double am = 0.980;
 		/* moon */
-		pat = cairo_pattern_create_radial ((0.5 * wdth) - wz, (0.2 * hght) - hz, 110,  (0.3 * wdth) - wz, (0.3 * hght) - hz, radii);
+		/*pat = cairo_pattern_create_radial ((0.5 * wdth) - wz, (0.2 * hght) - hz, 110,  (0.3 * wdth) - wz, (0.3 * hght) - hz, radii);
 		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.882, 0.749, 0.498, 0.8);
 		cairo_pattern_add_color_stop_rgba(pat, 0.8, 0.219, 0.278, 0.360, 0.8);
-		cairo_set_source(c, pat);
+		cairo_set_source(c, pat);*/
+		cairo_set_source_rgba(c, rm, gm, bm, am);
 		cairo_fill(c);
 		cairo_arc (c, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii, 0, M_PI * 2);
 		cairo_fill(c);
-		cairo_pattern_destroy(pat);
+		/*cairo_pattern_destroy(pat);*/
 	} /* moon and stars */
 
 	/* eclipe and stars */
@@ -436,11 +501,16 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			exit (EXIT_FAILURE);
 		}
 		
-		char fontfam[32];
-		char fontsz[4];
-		int fresult = sscanf(font, "%s %s", fontfam, fontsz);
-		if (fresult < 2) {
-			fprintf(stderr,"ERROR: less than 2 font arguments!\n");
+		char *fontfam;
+		char *fontsz;
+		char *p = strrchr(font, ' ');
+		int roo = strlen(p);
+		int wal = strlen(font);
+		int jack = wal - roo;
+		int kanga;
+		kanga = split(font, jack, &fontfam, &fontsz);
+		if (kanga != 1) {
+			printf("Unable to parse font string\n");
 			exit (EXIT_FAILURE);
 		}
 		double font_sz = atof(fontsz);
@@ -531,12 +601,12 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			if (ycol) {
 				int ylen = strlen(ycol);
 				if (ylen > 38 ) {
-					fprintf(stderr,"ERROR: colour argument too long\n");
+					fprintf(stderr,"ERROR: color argument too long\n");
 					exit (EXIT_FAILURE);
 				}
 				int yresult = sscanf(ycol, "%s %s %s %s", yred, ygreen, yblue, yalpha);
 				if (yresult < 4) {
-					fprintf(stderr,"ERROR: less than 4 colour aguments!\n");
+					fprintf(stderr,"ERROR: less than 4 color aguments!\n");
 					exit (EXIT_FAILURE);
 				}	
 			}
@@ -545,11 +615,16 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			yb = atof(yblue);
 			ya = atof(yalpha);
 			
-			char sfontfam[32];
-			char sfontsz[4];
-			int sfresult = sscanf(sfont, "%s %s", sfontfam, sfontsz);
-			if (sfresult < 2) {
-				fprintf(stderr,"ERROR: less than 2 font arguments!\n");
+			char *sfontfam;
+			char *sfontsz;
+			char *p = strrchr(sfont, ' ');
+			int roo = strlen(p);
+			int wal = strlen(sfont);
+			int jack = wal - roo;
+			int kanga;
+			kanga = split(sfont, jack, &sfontfam, &sfontsz);
+			if (kanga != 1) {
+				printf("Unable to parse font string\n");
 				exit (EXIT_FAILURE);
 			}
 			double sfont_sz = atof(sfontsz);
@@ -612,7 +687,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		aspect = (double)wdth / (double)hght;
 		if (aspect == 1.25) { /* SXGA */
 			wf =  wdth * 0.04;
-			sp = 0.0 - (7.0 * wf);  //-250.0;
+			sp = 0.0 - (7.0 * wf);
 			fp = wdth + (2 * wf);
 			awdth = fp;
 			ahght = hght;
@@ -621,7 +696,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			ahght = hght;
 		} else if ((aspect >= 1.3) && (aspect <= 1.34)) { /* VGA */
 			wf =  wdth * 0.02;
-			sp = 0.0 - (7.6 * wf);        //-300; //0.0 - (2.0 * wf);  //-250.0;
+			sp = 0.0 - (7.6 * wf);
 			fp = wdth + (2 * wf);
 			awdth = fp;
 			ahght = hght;
@@ -629,7 +704,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			cairo_translate(c, (sp / 1.3), 0.0);
 		} else if (aspect == 1.6) { /* widescreen */
 			wf =  wdth * 0.038;
-			sp = 0.0 - (2.0 * wf);  //-250.0;
+			sp = 0.0 - (2.0 * wf);
 			fp = wdth + (2 * wf);
 			awdth = fp;
 			ahght = hght;
@@ -693,23 +768,29 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		if (zcol) {
 			int zlen = strlen(zcol);
 			if (zlen > 38 ) {
-				fprintf(stderr,"ERROR: colour argument too long\n");
+				fprintf(stderr,"ERROR: color argument too long\n");
 				exit (EXIT_FAILURE);
 			}
 			int zresult = sscanf(zcol, "%s %s %s %s", zred, zgreen, zblue, zalpha);
 			if (zresult < 4) {
-				fprintf(stderr,"ERROR: less than 4 colour aguments!\n");
+				fprintf(stderr,"ERROR: less than 4 color aguments!\n");
 				exit (EXIT_FAILURE);
 			}	
 		}
 		zr = atof(zred);
 		zg = atof(zgreen);
 		zb = atof(zblue);
-		za = atof(zalpha);char tfontfam[32];
-		char tfontsz[4];
-		int tfresult = sscanf(tfont, "%s %s", tfontfam, tfontsz);
-		if (tfresult < 2) {
-			fprintf(stderr,"ERROR: less than 2 font arguments!\n");
+		za = atof(zalpha);
+		char *tfontfam;
+		char *tfontsz;
+		char *p = strrchr(tfont, ' ');
+		int roo = strlen(p);
+		int wal = strlen(tfont);
+		int jack = wal - roo;
+		int kanga;
+		kanga = split(tfont, jack, &tfontfam, &tfontsz);
+		if (kanga != 1) {
+			printf("Unable to parse font string\n");
 			exit (EXIT_FAILURE);
 		}
 		double tfont_sz = atof(tfontsz);
@@ -793,15 +874,13 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 	char *Lvalue = "debian"; /* main label for image */
-	char *Fvalue = "Poppl-Laudatio 40"; /* 1st font and size */
-	//int F_size = 40; /* font size */
+	char *lvalue = "Poppl-Laudatio 40"; /* 1st font and size */
+	char *Svalue = NULL; /* secondary label for image */
+	char *svalue = "font-logos 60"; /* 2nd font and size */
+	char *Tvalue = NULL; /* tertiary label for image */
+	char *tvalue = NULL; /* 3rd font and size */
 	char *jvalue = NULL; /* 1st font x y */
-	char *lvalue = NULL; /* secondary label for image */
-	char *fvalue = "font-logos 60"; /* 2nd font and size */
 	char *kvalue = NULL; /* 2nd font x y */
-	//int f_size = 60; /* font size, usually a logo font */
-	char *tvalue = NULL; /* tertiary label for image */
-	char *Tvalue = NULL; /* 3rd font and size */
 	char *mvalue = NULL; /* 3rd font x y */
 	char *nvalue = "foo"; /* image name */
 	char *dvalue = getenv("HOME");
@@ -819,14 +898,14 @@ int main(int argc, char **argv) {
 	int vflag = 0; 
 	int hflag = 0;
 	int c;
-	while ((c = getopt (argc, argv, "L:F:l:f:T:t:j:k:m:n:x:y:d:r:b:i:e:X:Y:Z:hvapc")) != -1) {
+	while ((c = getopt (argc, argv, "L:S:T:l:s:t:j:k:m:n:x:y:d:r:b:i:e:X:Y:Z:hvapc")) != -1) {
 		switch (c)
 		{
 			case 'L':
 				Lvalue = optarg;
 				break;
-			case 'F':
-				Fvalue = optarg;
+			case 'S':
+				Svalue = optarg;
 				break;
 			case 'T':
 				Tvalue = optarg;
@@ -834,8 +913,8 @@ int main(int argc, char **argv) {
 			case 'l':
 				lvalue = optarg;
 				break;
-			case 'f':
-				fvalue = optarg;
+			case 's':
+				svalue = optarg;
 				break;
 			case 't':
 				tvalue = optarg;
@@ -903,6 +982,8 @@ int main(int argc, char **argv) {
 				usage();
 		}
 	}
-	paint_img(Lvalue, Fvalue, lvalue, fvalue, tvalue, Tvalue, jvalue, kvalue, mvalue, nvalue, width, height, dvalue, rflag, bflag, aflag, pflag, ivalue, cflag, efact, Xval, Yval, Zval);
+	paint_img(Lvalue, lvalue, Svalue, svalue, Tvalue, tvalue, jvalue,
+		kvalue, mvalue, nvalue, width, height, dvalue, rflag, bflag,
+		aflag, pflag, ivalue, cflag, efact, Xval, Yval, Zval);
 	return 0;
 }
