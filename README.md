@@ -55,5 +55,5 @@ Everything will be located in the subdir `ff`
 ### To Do
 
  - [ ] code clean up
- - [ ] manual page
+ - [x] manual page
  - [ ] bug fixes
