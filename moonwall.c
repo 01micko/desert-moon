@@ -64,7 +64,7 @@ void usage() {
 	printf("\t-r [int 0 - 2] 0 is default; prints the stars in a random pattern.\n"
 		"\t\t\"-r1\" uses the default config to place the stars.\n"
 		"\t\t\"-r2\" uses a random pattern but prints that to stdout\n"	
-		"\t\tNOTE: only works with \"-b0\" option as all stars are produced.\n");	
+		"\t\tNOTE: only works with \"-b0\" option as all stars are produced.\n");
 	printf("\t-b [int 0 - 2] 0 is the default if \"-b\" is not specified\n");
 	printf("\t\t0 is a moon, 1 and 2 - see what happens :^)\n");
 	printf("\t-p : save to PNG, SVG is the default.\n");
@@ -93,7 +93,6 @@ static const char *get_user_out_file(char *destination) {
 		exit (EXIT_FAILURE);
 	}
 	return out_file;
-	
 }
 
 static cairo_pattern_t *lpattern(int angle, int wdth, int hght, double offset,
@@ -112,7 +111,6 @@ static cairo_pattern_t *lpattern(int angle, int wdth, int hght, double offset,
 static PangoLayout *hlayout(const char *font, double f_size, cairo_t *c, int wdth, char *label) {
 	PangoLayout *layout;
 	PangoFontDescription *font_description;
-		
 	font_description = pango_font_description_new ();
 	pango_font_description_set_family (font_description, font);
 	pango_font_description_set_style (font_description, PANGO_STYLE_NORMAL ); /*PANGO_STYLE_NORMAL = 0, PANGO_STYLE_OBLIQUE = 1*/
@@ -149,8 +147,6 @@ void pstrcpy(char *buf, int buf_size, const char *str) {
 	*q = '\0';
 }
 
-
-
 int split(const char *original, int offset, char **s1, char **s2)
 {
 	int len;
@@ -181,7 +177,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 	char alpha[8] = "1.0"; /* default opaque */
 	char *ent = "loc"; /* config */
 	double aspect;
-	
+
 	/* icon */
 	char icon[PATH_MAX];
 	char icon_pre[PATH_MAX];
@@ -190,7 +186,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 	int icon_x, icon_y;
 	if (iconin != NULL) {
 		int icon_res;
-		if (centred  == 0) {	
+		if (centred  == 0) {
 			icon_res = sscanf(iconin, "%s %s %s", icon_pre, posx, posy);
 			if (icon_res < 3) {
 				fprintf(stderr,"ERROR: path, x and y positions are required or use \"-c\" option\n");
@@ -211,7 +207,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			icon_x = atoi(posx);
 			icon_y = atoi(posy);
 	}
-	
 	int len = strlen(fp_color);
 	if (len > 32 ) {
 		fprintf(stderr,"ERROR: colour argument too long\n");
@@ -255,7 +250,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		fprintf(stderr, "Error: the \"-b\" arg must be between 0 and 2 inclusive\n");
 		exit (EXIT_FAILURE);
 	}
-	
+
 	if ((flag == 0) || (flag == 2)) {
 		r = r - 0.2;
 		g = g - 0.2;
@@ -291,7 +286,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_arc(c, 0.5 * wdth, 0.5 * hght, 0.5 * wdth, 0, M_PI * 2);
 		cairo_arc_negative(c, 0.5 * wdth, 0.5 * hght, 0.08 * wdth, M_PI * 2, 0);
 	} else {
-		cairo_rectangle(c, 0, 0, wdth, hght);		
+		cairo_rectangle(c, 0, 0, wdth, hght);
 	}
 	if  (flag == 0) {
 		cairo_set_source_rgb(c, 0.0, 0.0, 0.121);
@@ -332,7 +327,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			"setting to default", rnd);
 		rnd = 0;
 	}
-	
+
 	/* moon and stars */
 	if (flag == 0) {
 		int x;
@@ -384,10 +379,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		double bm = 0.913;
 		double am = 0.980;
 		/* moon */
-		/*pat = cairo_pattern_create_radial ((0.5 * wdth) - wz, (0.2 * hght) - hz, 110,  (0.3 * wdth) - wz, (0.3 * hght) - hz, radii);
-		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.882, 0.749, 0.498, 0.8);
-		cairo_pattern_add_color_stop_rgba(pat, 0.8, 0.219, 0.278, 0.360, 0.8);
-		cairo_set_source(c, pat);*/
 		cairo_set_source_rgba(c, rm, gm, bm, am);
 		cairo_fill(c);
 		cairo_arc (c, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii, 0, M_PI * 2);
@@ -501,7 +492,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			fprintf(stderr,"\"%s\" is too long!\n", label);
 			exit (EXIT_FAILURE);
 		}
-		
 		char *fontfam;
 		char *fontsz;
 		char *p = strrchr(font, ' ');
@@ -515,7 +505,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			exit (EXIT_FAILURE);
 		}
 		double font_sz = atof(fontsz);
-		
 		/* font color */
 		char xred[8];
 		char xgreen[8];
@@ -541,14 +530,12 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		xg = atof(xgreen);
 		xb = atof(xblue);
 		xa = atof(xalpha);
-		
 		/* font */
 		PangoLayout *layout;
 		layout = hlayout(fontfam, font_sz, c, wdth, label);
-		
 		/* position of text */
 		int xposi, yposi;
-		if (jpos) {	
+		if (jpos) {
 			char prex[8];
 			char prey[8];
 			int font_pos = sscanf(jpos, "%s %s", prex, prey);
@@ -579,17 +566,14 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 				xposi = (wdth / 2) - (wrect / 2);
 				yposi = (hght / 2) + 10;
 			}
-		
 		} else { /* fallback */
 			xposi = wdth / 2;
 			yposi = 3 * hght / 7;
 		}
-
 		cairo_move_to(c, xposi - wz , 1 * yposi -hz);
 		cairo_set_source_rgba(c, xr, xg, xb, xa);
 		pango_cairo_show_layout (c, layout);
 		g_object_unref (layout);
-		
 		if (slabel) { /* text for 2nd label */
 			char yred[8];
 			char ygreen[8];
@@ -609,7 +593,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 				if (yresult < 4) {
 					fprintf(stderr,"ERROR: less than 4 color aguments!\n");
 					exit (EXIT_FAILURE);
-				}	
+				}
 			}
 			yr = atof(yred);
 			yg = atof(ygreen);
@@ -663,13 +647,12 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 				xsposi = wdth / 2;
 				ysposi = (3 * hght / 7) + sfont_sz + 10;
 			}
-
 			cairo_move_to(c, xsposi - wz , 1 * ysposi -hz);
 			cairo_set_source_rgba(c, yr, yg, yb, ya);
 			pango_cairo_show_layout (c, slayout);
 		}
 	}
-	
+
 	/* foreground */
 	/*
 	 * Aspect ratios
@@ -717,7 +700,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			awdth = wdth;
 			ahght = hght;
 		}
-
 		double i = 0;
 		for (i = 0; i < 80; i++) {
 			double l = 0.00333 * i;
@@ -726,7 +708,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			cairo_curve_to(c, 0.1 * awdth, (0.4667 + l) * ahght, 0.2 * awdth, (0.4967 + l) * ahght, 0.3 * awdth, (0.5167 + l) * ahght);
 			cairo_curve_to(c, 0.4 * awdth, (0.5367 + l) * ahght, 0.5 * awdth, (0.5967 + l) * ahght, 0.6 * awdth, (0.4867 + l) * ahght);
 			cairo_curve_to(c, 0.75 * awdth, (0.3267 + l) * ahght, 0.85 * awdth, (0.3867 + l) * ahght, 1.0 * awdth, (0.3867 + l) * ahght);
-			cairo_line_to(c, fp, 1.0 * ahght);		
+			cairo_line_to(c, fp, 1.0 * ahght);
 			cairo_line_to(c, sp, 1.0 * ahght);
 			cairo_close_path(c);
 			cairo_set_source_rgba(c, r - p, g - p, b - p, a);
@@ -756,7 +738,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_fill(c);
 		cairo_pattern_destroy(pat);
 	} /* foreground */
-	
+
 	if (tlabel) {
 		char zred[8];
 		char zgreen[8];
@@ -824,7 +806,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			pango_layout_set_width(tlayout, wrect * PANGO_SCALE);
 			xtposi = (wdth / 2) - (wrect / 2);
 			ytposi = (hght / 2) + (hrect / 2);
-	
 		} else { /* fallback */
 			xtposi = wdth / 2;
 			ytposi = (3 * hght / 5) + tfont_sz + 10;
@@ -833,7 +814,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_set_source_rgba(c, zr, zg, zb, za);
 		pango_cairo_show_layout (c, tlayout);
 	}
-	
+
 	/* icon and position */
 	if (iconin != NULL) {
 		glob.image = cairo_image_surface_create_from_png(icon);
@@ -844,7 +825,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			icon_y = (hght / 2) - (hy / 2);
 		} else if ((centred == 1) && (label)){
 			icon_x = (wdth / 2) - (wx / 2);
-			icon_y = (hght / 2) - hy;			
+			icon_y = (hght / 2) - hy;
 		}
 		cairo_set_source_surface(c, glob.image, icon_x, icon_y);
 		cairo_paint(c);
