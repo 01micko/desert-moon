@@ -161,7 +161,9 @@ int split(const char *original, int offset, char **s1, char **s2)
 	}
 	pstrcpy(*s1, offset + 1, original);
 	pstrcpy(*s2, len-offset + 1, original + offset);
-	return(1);
+	free(&s1);
+	free(&s2);
+return(1);
 }
 
 void paint_img(char *label, const char *font, char *slabel, const char *sfont, char *tlabel, const char *tfont,
