@@ -1,5 +1,5 @@
 # desert-moon
-A program to produce a suite of images for boot screens, wallpapers, website banners.
+A program to produce a suite of images for boot screens, wallpapers, website banners and more.
 
 ### teaser
 
@@ -8,6 +8,10 @@ A program to produce a suite of images for boot screens, wallpapers, website ban
 YT vid for mock *plymouth* animation
 
 [desert-moonrise MKIII](https://youtu.be/llRHfF6z-qM)
+
+DebianArt debian 13 art submission
+
+[Desert Moonrise](https://wiki.debian.org/DebianArt/Themes/desert-moonrise)
 
 ### still WIP
 
@@ -40,22 +44,26 @@ If built without error run:
 ./buildwalls
 ```
 
-Everything will be located in the subdir `ff/`
+Everything will be located in the subdir `debian/`
+
+The script `buildwalls` can be edited to add custom fonts and tweaking of the name and logo.
 
 ### dependencies
 
- - cairo
- - pango
- - gcc
+ - cairo (build)
+ - pango (build)
+ - gcc (build)
  - bash
  - netpbm
  - ppmtolss16
  - ffmpeg (for animation)
  - rsvg
+ - Poppl-Laudatio or Prociono or another Serif font
+ - [font-logos](https://github.com/Lukas-W/font-logos) or perhaps fontawesome
 
 ### To Do
 
  - [x] code clean up
  - [x] manual page
  - [ ] bug fixes
- - [ ] other
+ - [ ] more error checking
