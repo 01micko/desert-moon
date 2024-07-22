@@ -1,40 +1,113 @@
 #!/usr/bin/env bash
+
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#     Copyright (C) Mick Amadio 2024 <01micko@gmail.com>
+
 set -e
+
 NAME=desert-moonrise
 
-echo hello $USER
+FONT1xx=''
+FONT2xx=''
+LOGOxx=''
 
-#sleep 2
-rm -rf ff/
-mkdir -p ff/plymouth ff/walls
+# these MUST be set
+DISTRO="debian"
+VERSION=13
 
-./moonwall -x800 -y75 -d ff -L'debian 13'  -s'font-logos 30' -S "$(printf "%b" "\\uf10a")" \
-  -j'240 6' -k'440 3' -l'Poppl-Laudatio 30' -n ${NAME}-installer -e80
-./moonwall -x1920 -y120 -d ff  -s 'font-logos 50' -S "$(printf "%b" "\\uf10a")" -k'680 -20' \
-  -n ${NAME}-banner -e46 -l'Poppl-Laudatio 40' -L "debian" -j'1100 -20'  -t"Poppl-Laudatio 20" \
+
+checkfont() {
+	if fc-list | grep -q "$1" ; then
+		echo "$1 is available :^)"
+		return 0
+	else
+		echo "$1 is unavailable :^("
+		echo "You can use a custom font."
+		echo "Edit the top of this script - $0"
+		if [ "$2" == "x" ] ; then
+			echo "or get \"font-logos\" from:"
+			echo "https://github.com/Lukas-W/font-logos"
+		fi
+		return 1
+	fi
+}
+
+export -f checkfont
+
+####################### DO NOT EDIT BELOW HERE ###########################
+
+if fc-list | grep -q 'Poppl-Laudatio'; then
+	FONT1="Poppl-Laudatio"
+elif fc-list | grep -q 'Prociono' ; then
+	FONT1="Prociono"
+else
+	FONT1="DejaVu Serif Condensed"
+fi
+
+FONT2="font-logos"
+LOGO=f10a
+
+# use your own fonts
+[ -n "$FONT1xx" ] && FONT1="$FONT1xx"
+[ -n "$FONT2xx" ] && FONT2="$FONT2xx"
+[ -n "$LOGOxx" ] && LOGO="$LOGOxx"
+
+checkfont "$FONT1" || exit 1
+checkfont "$FONT2" x || exit 1
+
+echo -e "Hello $USER, using font $FONT1 for text, $FONT2 for logos
+\twith $DISTRO distro version $VERSION"
+
+sleep 2
+rm -rf ${DISTRO}/
+mkdir -p ${DISTRO}/plymouth ${DISTRO}/walls
+
+./moonwall -x800 -y75 -d${DISTRO} -L"${DISTRO} ${VERSION}"  -s"${FONT2} 30" -S "$(printf "%b" "\\u$LOGO")" \
+  -j'240 6' -k'440 3' -l"${FONT1} 30" -n ${NAME}-installer -e80 -p
+
+./moonwall -x1920 -y120 -d${DISTRO}  -s "${FONT2} 50" -S "$(printf "%b" "\\u$LOGO")" -k'680 -20' \
+  -n ${NAME}-banner -e46 -l"${FONT1} 40" -L "${DISTRO}" -j'1100 -20'  -t"${FONT1} 20" \
   -m"1224 -5"-Z"0.9 0.9 0.9 0.65" -T"the universal operating system"
-./moonwall -x720 -y340 -d ff  -s 'font-logos 50' -S "$(printf "%b" "\\uf10a")" -k'100 60' \
-  -n ${NAME}-wikibanner -e130 -l'Poppl-Laudatio 26' -L "debian 13" -j'280 140' \
-  -T"the universal operating system" -t"Poppl-Laudatio 20" -m"210 240" -Z"0.9 0.9 0.9 0.5"
-./moonwall -x720 -y340 -d ff  -s 'font-logos 50' -S "$(printf "%b" "\\uf10a")" -k'100 60' \
-  -n ${NAME}-blogbanner -e130 -l'Poppl-Laudatio 26' -L "debian 13" -j'280 140' \
-  -T"https://deb.li/trixie" -t"Poppl-Laudatio 20" -m"250 240" -Z"0.9 0.9 0.9 0.5"
-./moonwall -x600 -y600 -d ff  -s 'font-logos 60' -S "$(printf "%b" "\\uf10a")" -k'100 120' \
-  -n ${NAME}-dvdlabel -e100 -l'Poppl-Laudatio 36' -L "debian 13" -j'240 190' \
-  -T"the universal operating system" -t"Poppl-Laudatio 20" -m"180 460" -Z"0.9 0.9 0.9 0.5"
-./moonwall -x1920 -y1080 -d ff  -s 'font-logos 60' -S "$(printf "%b" "\\uf10a")" -k'1160 320' \
+
+./moonwall -x720 -y340 -d${DISTRO} -s "${FONT2} 50" -S "$(printf "%b" "\\u$LOGO")" -k'100 60' \
+  -n ${NAME}-wikibanner -e130 -l"${FONT1} 26" -L "${DISTRO} ${VERSION}" -j'280 140' \
+  -T"the universal operating system" -t"${FONT1} 20" -m"210 240" -Z"0.9 0.9 0.9 0.5"
+
+./moonwall -x720 -y340 -d${DISTRO} -s "${FONT2} 50" -S "$(printf "%b" "\\u$LOGO")" -k'100 60' \
+  -n ${NAME}-blogbanner -e130 -l"${FONT1} 26" -L "${DISTRO} ${VERSION}" -j'280 140' \
+  -T"https://deb.li/trixie" -t"${FONT1} 20" -m"250 240" -Z"0.9 0.9 0.9 0.5"
+
+./moonwall -x600 -y600 -d${DISTRO} -s "${FONT2} 60" -S "$(printf "%b" "\\u$LOGO")" -k'100 120' \
+  -n ${NAME}-dvdlabel -e100 -l"${FONT1} 36" -L "${DISTRO} ${VERSION}" -j'240 190' \
+  -T"the universal operating system" -t"${FONT1} 20" -m"180 460" -Z"0.9 0.9 0.9 0.5"
+
+./moonwall -x1920 -y1080 -d${DISTRO} -s "${FONT2} 60" -S "$(printf "%b" "\\u$LOGO")" -k'1160 320' \
   -n ${NAME}-login -e100 -L " " \
-  -T"debian" -t"Poppl-Laudatio 80" -m"460 900" -Z"0.9 0.9 0.9 0.5"
-./moonwall -x640 -y480 -d ff  -s 'font-logos 40' -S "$(printf "%b" "\\uf10a")" -k'460 120' \
+  -T"${DISTRO}" -t"${FONT1} 80" -m"460 900" -Z"0.9 0.9 0.9 0.5"
+
+./moonwall -x640 -y480 -d${DISTRO} -s "${FONT2} 40" -S "$(printf "%b" "\\u$LOGO")" -k'460 120' \
   -n ${NAME}-grub-in -e100 -L " " \
-  -T"debian" -t"Poppl-Laudatio 22" -m"300 300" -Z"0.9 0.9 0.9 0.5" -p
-cat ff/${NAME}-grub-in.png|pngtopnm|pnmquant 65536|pnmtopng > ff/${NAME}-grub.png && echo ${NAME}-grub.png created || echo ${NAME}-grub.png failed
-./moonwall -x640 -y300 -s "font-logos 80" -dff -n ${NAME}-syslinux-in -S "$(printf "%b" "\\uf10a")" -k'120 60' -L" " -p
-cat ff/${NAME}-syslinux-in.png|pngtopnm|pnmquant 65536|pnmtopng > ff/${NAME}-syslinux.png && echo ${NAME}-syslinux.png created || echo ${NAME}-syslinux.png failed
-./moonwall -x640 -y300 -s "font-logos 80" -dff -n ${NAME}-isolinux-in -S "$(printf "%b" "\\uf10a")" -k'120 60' -L" " -p
-cat ff/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|ppmtolss16 > ff/${NAME}-isolinux.lss && echo ${NAME}-isolinux.lss created || echo ${NAME}-isolinux.lss failed
-cat ff/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|pnmtopng >  ff/${NAME}-isolinux.png
-rm -f ff/${NAME}-*-in.png
+  -T"${DISTRO}" -t"${FONT1} 22" -m"300 300" -Z"0.9 0.9 0.9 0.5" -p
+cat ${DISTRO}/${NAME}-grub-in.png|pngtopnm|pnmquant 65536|pnmtopng > ${DISTRO}/${NAME}-grub.png && echo ${NAME}-grub.png created || echo ${NAME}-grub.png failed
+
+./moonwall -x640 -y300 -s "${FONT2} 80" -d${DISTRO} -n ${NAME}-syslinux-in -S "$(printf "%b" "\\u$LOGO")" -k'120 60' -L" " -p
+cat ${DISTRO}/${NAME}-syslinux-in.png|pngtopnm|pnmquant 65536|pnmtopng > ${DISTRO}/${NAME}-syslinux.png && echo ${NAME}-syslinux.png created || echo ${NAME}-syslinux.png failed
+./moonwall -x640 -y300 -s "${FONT2} 80" -d${DISTRO} -n ${NAME}-isolinux-in -S "$(printf "%b" "\\u$LOGO")" -k'120 60' -L" " -p
+cat ${DISTRO}/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|ppmtolss16 > ${DISTRO}/${NAME}-isolinux.lss && echo ${NAME}-isolinux.lss created || echo ${NAME}-isolinux.lss failed
+cat ${DISTRO}/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|pnmtopng >  ${DISTRO}/${NAME}-isolinux.png
+
+rm -f ${DISTRO}/${NAME}-*-in.png
 
 for e in SXGA VGA wide FHD ; do
     echo $e
@@ -44,7 +117,7 @@ for e in SXGA VGA wide FHD ; do
 	wide)X=1920 Y=1200 K='500 400';;
 	 FHD)X=1920 Y=1080 K='400 400';;
     esac
-    ./moonwall -x $X -y $Y -s "font-logos 80" -n ${NAME}${e} -S "$(printf "%b" "\\uf10a")" -k"$K" -d ff/walls
+    ./moonwall -x $X -y $Y -L${DISTRO} -s "${FONT2} 80" -n ${NAME}${e} -S "$(printf "%b" "\\u$LOGO")" -k"$K" -d ${DISTRO}/walls
 done
 
 x=1;
@@ -52,11 +125,11 @@ while [ $x -lt 200 ]; do
     n=''
     [ $x -lt 10 ] && n=00
     [ $x -lt 100 ] && [ $x -ge 10 ] && n=0
-   ./moonwall -x1920 -y1080 -s "font-logos 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\uf10a")" -k'300 400' -l'Poppl-Laudatio 60' -Ldebian -j'520 840' -e${x} -p -d ff/plymouth
+   ./moonwall -x1920 -y1080 -s "${FONT2} 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\u$LOGO")" -k'300 400' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -p -d ${DISTRO}/plymouth
    x=$(($x + 1))
 done
 
-(cd ff/plymouth
+(cd ${DISTRO}/plymouth
 x=1
 while [ $x -lt 32 ] ; do 
     f=${NAME}199.png
@@ -69,12 +142,14 @@ done
 x=231
 q=10
 while [ $x -lt 281 ] ; do 
-    ./moonwall -x1920 -y1080 -s "font-logos 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\uf10a")" -k'300 400' -l'Poppl-Laudatio 60' -Ldebian -j'520 840' -e199 -T13 -t"Poppl-Laudatio 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -p -d ff/plymouth
+    ./moonwall -x1920 -y1080 -s "${FONT2} 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\u$LOGO")" -k'300 400' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e199 -T${VERSION} -t"${FONT1} 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -p -d ${DISTRO}/plymouth
     x=$(($x + 1))
     q=$(($q + 1))
 done
 
 
-(cd ff/plymouth
+(cd ${DISTRO}/plymouth
 ffmpeg -framerate 16 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p ../${NAME}.mp4 -y
 )
+
+exit 0
