@@ -149,6 +149,8 @@ void pstrcpy(char *buf, int buf_size, const char *str) {
 	*q = '\0';
 }
 
+
+
 int split(const char *original, int offset, char **s1, char **s2)
 {
 	int len;
@@ -179,7 +181,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 	char alpha[8] = "1.0"; /* default opaque */
 	char *ent = "loc"; /* config */
 	double aspect;
-
+	
 	/* icon */
 	char icon[PATH_MAX];
 	char icon_pre[PATH_MAX];
@@ -209,7 +211,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			icon_x = atoi(posx);
 			icon_y = atoi(posy);
 	}
-
+	
 	int len = strlen(fp_color);
 	if (len > 32 ) {
 		fprintf(stderr,"ERROR: colour argument too long\n");
@@ -253,7 +255,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		fprintf(stderr, "Error: the \"-b\" arg must be between 0 and 2 inclusive\n");
 		exit (EXIT_FAILURE);
 	}
-
+	
 	if ((flag == 0) || (flag == 2)) {
 		r = r - 0.2;
 		g = g - 0.2;
@@ -287,6 +289,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_close_path(c);	
 	} else if (strcmp(name, "desert-moonrise-dvdlabel") == 0) {
 		cairo_arc(c, 0.5 * wdth, 0.5 * hght, 0.5 * wdth, 0, M_PI * 2);
+		cairo_arc_negative(c, 0.5 * wdth, 0.5 * hght, 0.08 * wdth, M_PI * 2, 0);
 	} else {
 		cairo_rectangle(c, 0, 0, wdth, hght);		
 	}
@@ -329,7 +332,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			"setting to default", rnd);
 		rnd = 0;
 	}
-
+	
 	/* moon and stars */
 	if (flag == 0) {
 		int x;
@@ -381,6 +384,10 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		double bm = 0.913;
 		double am = 0.980;
 		/* moon */
+		/*pat = cairo_pattern_create_radial ((0.5 * wdth) - wz, (0.2 * hght) - hz, 110,  (0.3 * wdth) - wz, (0.3 * hght) - hz, radii);
+		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.882, 0.749, 0.498, 0.8);
+		cairo_pattern_add_color_stop_rgba(pat, 0.8, 0.219, 0.278, 0.360, 0.8);
+		cairo_set_source(c, pat);*/
 		cairo_set_source_rgba(c, rm, gm, bm, am);
 		cairo_fill(c);
 		cairo_arc (c, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii, 0, M_PI * 2);
@@ -534,7 +541,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		xg = atof(xgreen);
 		xb = atof(xblue);
 		xa = atof(xalpha);
-
+		
 		/* font */
 		PangoLayout *layout;
 		layout = hlayout(fontfam, font_sz, c, wdth, label);
@@ -572,6 +579,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 				xposi = (wdth / 2) - (wrect / 2);
 				yposi = (hght / 2) + 10;
 			}
+		
 		} else { /* fallback */
 			xposi = wdth / 2;
 			yposi = 3 * hght / 7;
@@ -581,7 +589,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_set_source_rgba(c, xr, xg, xb, xa);
 		pango_cairo_show_layout (c, layout);
 		g_object_unref (layout);
-
+		
 		if (slabel) { /* text for 2nd label */
 			char yred[8];
 			char ygreen[8];
@@ -607,6 +615,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			yg = atof(ygreen);
 			yb = atof(yblue);
 			ya = atof(yalpha);
+			
 			char *sfontfam;
 			char *sfontsz;
 			char *p = strrchr(sfont, ' ');
@@ -649,15 +658,18 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 				pango_layout_set_width(slayout, wrect * PANGO_SCALE);
 				xsposi = (wdth / 2) - (wrect / 2);
 				ysposi = (hght / 2) + (hrect / 2);
+		
 			} else { /* fallback */
 				xsposi = wdth / 2;
 				ysposi = (3 * hght / 7) + sfont_sz + 10;
 			}
+
 			cairo_move_to(c, xsposi - wz , 1 * ysposi -hz);
 			cairo_set_source_rgba(c, yr, yg, yb, ya);
 			pango_cairo_show_layout (c, slayout);
 		}
 	}
+	
 	/* foreground */
 	/*
 	 * Aspect ratios
@@ -705,6 +717,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			awdth = wdth;
 			ahght = hght;
 		}
+
 		double i = 0;
 		for (i = 0; i < 80; i++) {
 			double l = 0.00333 * i;
@@ -735,15 +748,15 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 	} else if (strcmp(name, "desert-moonrise-dvdlabel") == 0) {
 		pat = lpattern(20.0, wdth / 2, hght, 0.45, 0.405, 0.217, 0.115, 0.315, 0.127, 0.0555, 1.0, 0);
 		cairo_move_to(c, 0.0, 0.5 * hght);
-		cairo_curve_to(c, 0.25 * wdth, 0.5067 * hght, 0.36 * wdth, 0.667 * hght, 0.6 * wdth, 0.5 * hght);
-		cairo_curve_to(c, 0.69 * wdth, 0.4367 * hght, 0.79 * wdth, 0.4467 * hght, wdth, 0.5 * hght);
+		cairo_curve_to(c, 0.25 * wdth, 0.5167 * hght, 0.36 * wdth, 0.667 * hght, 0.6 * wdth, 0.55 * hght);
+		cairo_curve_to(c, 0.69 * wdth, 0.4967 * hght, 0.79 * wdth, 0.4767 * hght, wdth, 0.5 * hght);
 		cairo_arc (c, 0.5 * wdth, 0.5 * hght, 0.5 * wdth, M_PI * 2, M_PI);
 		cairo_close_path(c);
 		cairo_set_source(c, pat);
 		cairo_fill(c);
 		cairo_pattern_destroy(pat);
 	} /* foreground */
-
+	
 	if (tlabel) {
 		char zred[8];
 		char zgreen[8];
@@ -811,6 +824,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			pango_layout_set_width(tlayout, wrect * PANGO_SCALE);
 			xtposi = (wdth / 2) - (wrect / 2);
 			ytposi = (hght / 2) + (hrect / 2);
+	
 		} else { /* fallback */
 			xtposi = wdth / 2;
 			ytposi = (3 * hght / 5) + tfont_sz + 10;
@@ -819,7 +833,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_set_source_rgba(c, zr, zg, zb, za);
 		pango_cairo_show_layout (c, tlayout);
 	}
-
+	
 	/* icon and position */
 	if (iconin != NULL) {
 		glob.image = cairo_image_surface_create_from_png(icon);
