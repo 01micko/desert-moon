@@ -56,7 +56,7 @@ The script `buildwalls` can be edited to add custom fonts and tweaking of the na
  - bash
  - netpbm
  - ppmtolss16
- - ffmpeg (for animation)
+ - ffmpeg (for animation - optional)
  - rsvg
  - Poppl-Laudatio or Prociono or another Serif font
  - [font-logos](https://github.com/Lukas-W/font-logos) or perhaps fontawesome
