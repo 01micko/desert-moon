@@ -16,8 +16,6 @@
 
 set -e
 
-NAME=desert-moonrise
-
 FONT1xx=''
 FONT2xx=''
 LOGOxx=''
@@ -26,6 +24,16 @@ LOGOxx=''
 DISTRO="debian"
 VERSION=13
 
+####################### DO NOT EDIT BELOW HERE ###########################
+
+ver=0.1.0
+
+usage() {
+	echo -e "$0\n\t-f : to build video with ffmpeg\n\t-a : build everything"
+	echo -e "\t-h : show help\n\t-v : show version\n"
+	echo -e "\tWith no args only the images are built\n"
+	exit
+}
 
 checkfont() {
 	if fc-list | grep -q "$1" ; then
@@ -43,9 +51,21 @@ checkfont() {
 	fi
 }
 
-export -f checkfont
+export -f checkfont usage
 
-####################### DO NOT EDIT BELOW HERE ###########################
+
+#parameters
+while [ $# -gt 0 ]; do
+	case "$1" in
+	-f|-a|'') FF='yes_ffmpeg' ;;
+	-h|*-help)usage;;
+	-v)echo "$0 $ver" && exit 0;;
+	*) echo "Invalid argument: $1";usage;;
+	esac
+	shift
+done
+
+NAME=desert-moonrise
 
 if fc-list | grep -q 'Poppl-Laudatio'; then
 	FONT1="Poppl-Laudatio"
@@ -88,6 +108,10 @@ mkdir -p ${DISTRO}/plymouth ${DISTRO}/walls
   -n ${NAME}-blogbanner -e130 -l"${FONT1} 26" -L "${DISTRO} ${VERSION}" -j'280 140' \
   -T"https://deb.li/trixie" -t"${FONT1} 20" -m"250 240" -Z"0.9 0.9 0.9 0.5"
 
+./moonwall -x720 -y180 -d${DISTRO} -s "${FONT2} 70" -S "$(printf "%b" "\\u$LOGO")" -k'80 40' \
+  -Y"0.780 0.0 0.211 1.0" -n ${NAME}-sticker -e120 -l"${FONT1} 100" -L "${DISTRO} ${VERSION}" -j'220 60' \
+  -X"0.9 0.9 0.9 0.7" -T"trixie" -t"${FONT1} 34" -m"550 150" -Z"0.9 0.9 0.9 0.5"
+
 ./moonwall -x600 -y600 -d${DISTRO} -s "${FONT2} 60" -S "$(printf "%b" "\\u$LOGO")" -k'100 120' \
   -n ${NAME}-dvdlabel -e100 -l"${FONT1} 36" -L "${DISTRO} ${VERSION}" -j'240 190' \
   -T"the universal operating system" -t"${FONT1} 20" -m"180 460" -Z"0.9 0.9 0.9 0.5"
@@ -96,6 +120,10 @@ mkdir -p ${DISTRO}/plymouth ${DISTRO}/walls
   -n ${NAME}-login -e100 -L " " \
   -T"${DISTRO}" -t"${FONT1} 80" -m"460 900" -Z"0.9 0.9 0.9 0.5"
 
+./moonwall -x1000 -y1000 -d${DISTRO} -s "${FONT2} 800" -S "$(printf "%b" "\\u$LOGO")" -k'100 20' \
+  -Y"0.96 0.96 0.96 0.4" -n ${NAME}-tshirt -e80 -l"${FONT1} 120" -L "${DISTRO}" -j'350 540' \
+  -T"trixie" -t"${FONT1} 50" -m"700 700" -Z"0.780 0.0 0.211 1.0"
+
 ./moonwall -x640 -y480 -d${DISTRO} -s "${FONT2} 40" -S "$(printf "%b" "\\u$LOGO")" -k'460 120' \
   -n ${NAME}-grub-in -e100 -L " " \
   -T"${DISTRO}" -t"${FONT1} 22" -m"300 300" -Z"0.9 0.9 0.9 0.5" -p
@@ -103,6 +131,7 @@ cat ${DISTRO}/${NAME}-grub-in.png|pngtopnm|pnmquant 65536|pnmtopng > ${DISTRO}/$
 
 ./moonwall -x640 -y300 -s "${FONT2} 80" -d${DISTRO} -n ${NAME}-syslinux-in -S "$(printf "%b" "\\u$LOGO")" -k'120 60' -L" " -p
 cat ${DISTRO}/${NAME}-syslinux-in.png|pngtopnm|pnmquant 65536|pnmtopng > ${DISTRO}/${NAME}-syslinux.png && echo ${NAME}-syslinux.png created || echo ${NAME}-syslinux.png failed
+
 ./moonwall -x640 -y300 -s "${FONT2} 80" -d${DISTRO} -n ${NAME}-isolinux-in -S "$(printf "%b" "\\u$LOGO")" -k'120 60' -L" " -p
 cat ${DISTRO}/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|ppmtolss16 > ${DISTRO}/${NAME}-isolinux.lss && echo ${NAME}-isolinux.lss created || echo ${NAME}-isolinux.lss failed
 cat ${DISTRO}/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|pnmtopng >  ${DISTRO}/${NAME}-isolinux.png
@@ -117,39 +146,45 @@ for e in SXGA VGA wide FHD ; do
 	wide)X=1920 Y=1200 K='500 400';;
 	 FHD)X=1920 Y=1080 K='400 400';;
     esac
-    ./moonwall -x $X -y $Y -L${DISTRO} -s "${FONT2} 80" -n ${NAME}${e} -S "$(printf "%b" "\\u$LOGO")" -k"$K" -d ${DISTRO}/walls
+    ./moonwall -x $X -y $Y -L${DISTRO} -c -s "${FONT2} 80" -n ${NAME}${e} -S "$(printf "%b" "\\u$LOGO")" -k"$K" -d ${DISTRO}/walls
 done
 
-x=1;
-while [ $x -lt 200 ]; do
-    n=''
-    [ $x -lt 10 ] && n=00
-    [ $x -lt 100 ] && [ $x -ge 10 ] && n=0
-   ./moonwall -x1920 -y1080 -s "${FONT2} 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\u$LOGO")" -k'300 400' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -p -d ${DISTRO}/plymouth
-   x=$(($x + 1))
-done
+# the following needs ffmpeg
+if  [[ "$FF" == 'yes_ffmpeg' ]] ; then
+	type ffmpeg >/dev/null 2>&1 || {
+		echo "no ffmpeg installed" && exit 0
+	}
+	x=1;
+	while [ $x -lt 200 ]; do
+	n=''
+	[ $x -lt 10 ] && n=00
+	[ $x -lt 100 ] && [ $x -ge 10 ] && n=0
+	./moonwall -x1920 -y1080 -s "${FONT2} 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\u$LOGO")" -k'300 400' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -p -d ${DISTRO}/plymouth
+	x=$(($x + 1))
+	done
 
-(cd ${DISTRO}/plymouth
-x=1
-while [ $x -lt 32 ] ; do 
-    f=${NAME}199.png
-    z=$((199 + $x))
-    cp -f  $f ${f/199/$z}
-    x=$(($x + 1))
-done
-)
+	(cd ${DISTRO}/plymouth
+	x=1
+	while [ $x -lt 32 ] ; do 
+		f=${NAME}199.png
+		z=$((199 + $x))
+		cp -f  $f ${f/199/$z}
+		x=$(($x + 1))
+	done
+	)
 
-x=231
-q=10
-while [ $x -lt 281 ] ; do 
-    ./moonwall -x1920 -y1080 -s "${FONT2} 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\u$LOGO")" -k'300 400' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e199 -T${VERSION} -t"${FONT1} 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -p -d ${DISTRO}/plymouth
-    x=$(($x + 1))
-    q=$(($q + 1))
-done
+	x=231
+	q=10
+	while [ $x -lt 281 ] ; do 
+		./moonwall -x1920 -y1080 -s "${FONT2} 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\u$LOGO")" -k'300 400' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e199 -T${VERSION} -t"${FONT1} 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -p -d ${DISTRO}/plymouth
+		x=$(($x + 1))
+		q=$(($q + 1))
+	done
 
 
-(cd ${DISTRO}/plymouth
-ffmpeg -framerate 16 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p ../${NAME}.mp4 -y
-)
+	(cd ${DISTRO}/plymouth
+	ffmpeg -framerate 16 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p ../${NAME}.mp4 -y
+	)
+fi
 
 exit 0
