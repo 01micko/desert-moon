@@ -161,9 +161,117 @@ int split(const char *original, int offset, char **s1, char **s2)
 	}
 	pstrcpy(*s1, offset + 1, original);
 	pstrcpy(*s2, len-offset + 1, original + offset);
-	free(&s1);
-	free(&s2);
 	return(1);
+}
+
+void paint_foreground(cairo_t *c, double aspect, int wdth, int hght, double r, double g, double b, double a) {
+	int ahght;
+	int awdth;
+	double wf;
+	double sp;
+	double fp;
+	/*
+	 * Aspect ratios
+	 * 1280x1024 or 2560x2048 5:4 SXGA
+	 * 1600x1200 or 2048x1536 4:3 standard
+	 * 1920x1200 or 2560x1600 16:10 widescreen
+	 * 1920x1080 16:9 FullHD
+	 *
+	 */
+	if (aspect == 1.25) { /* SXGA */
+		wf =  wdth * 0.04;
+		sp = 0.0 - (7.0 * wf);
+		fp = wdth + (2 * wf);
+		awdth = fp;
+		ahght = hght;
+		cairo_scale(c, 1.32, 1.0);
+		cairo_translate(c, (sp / 1.7), 0.0);
+		ahght = hght;
+	} else if ((aspect >= 1.3) && (aspect <= 1.34)) { /* VGA */
+		wf =  wdth * 0.02;
+		sp = 0.0 - (7.6 * wf);
+		fp = wdth + (2 * wf);
+		awdth = fp;
+		ahght = hght;
+		cairo_scale(c, 1.25, 1.0);
+		cairo_translate(c, (sp / 1.3), 0.0);
+	} else if (aspect == 1.6) { /* widescreen */
+		wf =  wdth * 0.038;
+		sp = 0.0 - (2.0 * wf);
+		fp = wdth + (2 * wf);
+		awdth = fp;
+		ahght = hght;
+		cairo_translate(c, (sp / 2), 0.0);
+	} else if ((aspect >= 1.7) || (aspect <= 1.78)) { /* FHD */
+		wf =  wdth;
+		sp = 0.0;
+		fp = wdth;
+		awdth = wdth;
+		ahght = hght;
+	}
+	double i = 0;
+		for (i = 0; i < 80; i++) {
+		double l = 0.00333 * i;
+		double p = 0.0027 * i;
+		cairo_move_to(c, sp, (0.4667 + l) * ahght);
+		cairo_curve_to(c, 0.1 * awdth, (0.4667 + l) * ahght, 0.2 * awdth, (0.4967 + l) * ahght, 0.3 * awdth, (0.5167 + l) * ahght);
+		cairo_curve_to(c, 0.4 * awdth, (0.5367 + l) * ahght, 0.5 * awdth, (0.5967 + l) * ahght, 0.6 * awdth, (0.4867 + l) * ahght);
+		cairo_curve_to(c, 0.75 * awdth, (0.3267 + l) * ahght, 0.85 * awdth, (0.3867 + l) * ahght, 1.0 * awdth, (0.3867 + l) * ahght);
+		cairo_line_to(c, fp, 1.0 * ahght);
+		cairo_line_to(c, sp, 1.0 * ahght);
+		cairo_close_path(c);
+		cairo_set_source_rgba(c, r - p, g - p, b - p, a);
+		cairo_fill(c);
+	}
+	i = 0;
+	for (i = 0; i < 130; i++) {
+		double l = 0.00333 * i;
+		double q = 0.0037 * i;
+		cairo_move_to(c, sp, (0.6667 + l) * ahght);
+		cairo_curve_to(c, 0.22 * awdth, (0.7667 + l) * ahght, 0.33 * awdth, (0.8067 + l) * ahght, 0.55 * awdth, (0.7167 + l) * ahght);
+		cairo_curve_to(c, 0.7 * awdth, (0.6367 + l) * ahght, 0.8 * awdth, (0.6167 + l) * ahght, 1.0 * awdth, (0.5667 + l) * ahght);
+		cairo_line_to(c, fp, 1.0 * ahght);
+		cairo_line_to(c, sp, 1.0 * ahght);
+		cairo_close_path(c);
+		cairo_set_source_rgba(c, r - q, g - q, b - q, a);
+		cairo_fill(c);
+	}
+}
+
+void paint_sforeground(cairo_t *c, int wdth, int hght, double r, double g, double b, double a) {
+	printf("painting %d %d ", wdth, hght);
+	double rd = (double)wdth / 25;
+	double i = 0;
+		for (i = 0; i < 60; i++) {
+		double l = 0.00333 * i;
+		double p = 0.0027 * i;
+		cairo_move_to(c, 0.0, (0.4667 + l) * hght);
+		cairo_curve_to(c, 0.1 * wdth, (0.4667 + l) * hght, 0.2 * wdth, (0.4967 + l) * hght, 0.3 * wdth, (0.5167 + l) * hght);
+		cairo_curve_to(c, 0.4 * wdth, (0.5367 + l) * hght, 0.5 * wdth, (0.5967 + l) * hght, 0.6 * wdth, (0.4867 + l) * hght);
+		cairo_curve_to(c, 0.75 * wdth, (0.3267 + l) * hght, 0.85 * wdth, (0.3867 + l) * hght, 1.0 * wdth, (0.3867 + l) * hght);
+		cairo_line_to(c, wdth, hght - rd);
+		cairo_curve_to (c, wdth, hght, wdth, hght, wdth - rd, hght);
+		cairo_line_to(c, rd, hght);
+		cairo_curve_to (c, 0.0, hght, 0.0, hght, 0.0, hght - rd);
+		cairo_close_path(c);
+		cairo_set_source_rgba(c, r - p, g - p, b - p, a);
+		cairo_fill(c);
+	}
+	i = 0;
+	for (i = 0; i < 60; i++) {
+		double l = 0.00333 * i;
+		double q = 0.0037 * i;
+		cairo_move_to(c, 0.0, (0.6667 + l) * hght);
+		cairo_curve_to(c, 0.22 * wdth, (0.7667 + l) * hght, 0.33 * wdth, (0.8067 + l) * hght, 0.55 * wdth, (0.7167 + l) * hght);
+		cairo_curve_to(c, 0.7 * wdth, (0.6367 + l) * hght, 0.8 * wdth, (0.6167 + l) * hght, 1.0 * wdth, (0.5667 + l) * hght);
+		cairo_line_to(c, wdth, hght - rd);
+		cairo_curve_to (c, wdth, hght, wdth, hght, wdth - rd, hght);
+		cairo_line_to(c, rd, hght);
+		cairo_curve_to (c, 0.0, hght, 0.0, hght, 0.0, hght - rd);
+		cairo_close_path(c);
+		cairo_set_source_rgba(c, r - q, g - q, b - q, a);
+		cairo_fill(c);
+	}
 }
 
 void paint_img(char *label, const char *font, char *slabel, const char *sfont, char *tlabel, const char *tfont,
@@ -252,13 +360,11 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		fprintf(stderr, "Error: the \"-b\" arg must be between 0 and 2 inclusive\n");
 		exit (EXIT_FAILURE);
 	}
-
 	if ((flag == 0) || (flag == 2)) {
 		r = r - 0.2;
 		g = g - 0.2;
 		b = b - 0.2;
 	}
-
 	cairo_surface_t *cs;
 	if (pflag == 0) {
 		snprintf(destimg, sizeof(destimg), "%s/%s.svg", get_user_out_file(dest), name);
@@ -267,12 +373,11 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cs = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wdth, hght); /* CAIRO_FORMAT_RGB16_565  16 bit */
 		snprintf(destimg, sizeof(destimg), "%s/%s.png", get_user_out_file(dest), name);
 	}
-
 	cairo_t *c;
 	c = cairo_create(cs);
 	cairo_pattern_t *pat;
 	/* sky */
-	if (strcmp(name, "desert-moonrise-wikibanner") == 0) {
+	if ((strcmp(name, "desert-moonrise-wikibanner") == 0) || (strcmp(name, "desert-moonrise-sticker") == 0)) { /* relaxed corners */
 		double r = (double)wdth / 25;
 		cairo_move_to(c, r, 0);
 		cairo_line_to(c, wdth - r, 0.0);
@@ -283,8 +388,8 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_curve_to (c, 0.0, hght, 0.0, hght, 0.0, hght - r);
 		cairo_line_to(c, 0.0, r);
 		cairo_curve_to (c, 0.0, 0.0, 0.0, 0.0, r, 0.0);
-		cairo_close_path(c);	
-	} else if (strcmp(name, "desert-moonrise-dvdlabel") == 0) {
+		cairo_close_path(c);
+	} else if (strcmp(name, "desert-moonrise-dvdlabel") == 0) { /* circle */
 		cairo_arc(c, 0.5 * wdth, 0.5 * hght, 0.5 * wdth, 0, M_PI * 2);
 		cairo_arc_negative(c, 0.5 * wdth, 0.5 * hght, 0.08 * wdth, M_PI * 2, 0);
 	} else {
@@ -376,9 +481,9 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			}
 		}
 
-		double rm = 0.835;
-		double gm = 0.870;
-		double bm = 0.913;
+		double rm = 0.549;//0.549 0.494 0.400
+		double gm = 0.494;
+		double bm = 0.400;
 		double am = 0.980;
 		/* moon */
 		cairo_set_source_rgba(c, rm, gm, bm, am);
@@ -484,8 +589,11 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_arc (c, 0.384 * wdth, 0.530 * hght, radii, 0, M_PI * 2);
 		cairo_fill(c);
 		cairo_pattern_destroy(pat);
-
 	} /* sunset */
+	
+	if (strcmp(name, "desert-moonrise-sticker") == 0) {
+		paint_sforeground(c, wdth, hght, r, g, b, a);
+	}
 	
 	/* text for main label */
 	if (label) {
@@ -656,79 +764,12 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 	}
 
 	/* foreground */
-	/*
-	 * Aspect ratios
-	 * 1280x1024 or 2560x2048 5:4 SXGA
-	 * 1600x1200 or 2048x1536 4:3 standard
-	 * 1920x1200 or 2560x1600 16:10 widescreen
-	 * 1920x1080 16:9 FullHD
-	 *
-	 */
-	if (strcmp(name, "desert-moonrise-dvdlabel") != 0) {
-		int ahght;
-		int awdth;
-		double wf;
-		double sp;
-		double fp;
+	if ((!strcmp(name, "desert-moonrise-sticker") == 0) && 
+		(!strcmp(name, "desert-moonrise-dvdlabel") == 0) &&
+		(!strcmp(name, "desert-moonrise-wikibanner") == 0) &&
+		(!strcmp(name, "desert-moonrise-tshirt") == 0)) {
 		aspect = (double)wdth / (double)hght;
-		if (aspect == 1.25) { /* SXGA */
-			wf =  wdth * 0.04;
-			sp = 0.0 - (7.0 * wf);
-			fp = wdth + (2 * wf);
-			awdth = fp;
-			ahght = hght;
-			cairo_scale(c, 1.32, 1.0);
-			cairo_translate(c, (sp / 1.7), 0.0);
-			ahght = hght;
-		} else if ((aspect >= 1.3) && (aspect <= 1.34)) { /* VGA */
-			wf =  wdth * 0.02;
-			sp = 0.0 - (7.6 * wf);
-			fp = wdth + (2 * wf);
-			awdth = fp;
-			ahght = hght;
-			cairo_scale(c, 1.25, 1.0);
-			cairo_translate(c, (sp / 1.3), 0.0);
-		} else if (aspect == 1.6) { /* widescreen */
-			wf =  wdth * 0.038;
-			sp = 0.0 - (2.0 * wf);
-			fp = wdth + (2 * wf);
-			awdth = fp;
-			ahght = hght;
-			cairo_translate(c, (sp / 2), 0.0);
-		} else if ((aspect >= 1.7) || (aspect <= 1.78)) { /* FHD */
-			wf =  wdth;
-			sp = 0.0;
-			fp = wdth;
-			awdth = wdth;
-			ahght = hght;
-		}
-		double i = 0;
-		for (i = 0; i < 80; i++) {
-			double l = 0.00333 * i;
-			double p = 0.0027 * i;
-			cairo_move_to(c, sp, (0.4667 + l) * ahght);
-			cairo_curve_to(c, 0.1 * awdth, (0.4667 + l) * ahght, 0.2 * awdth, (0.4967 + l) * ahght, 0.3 * awdth, (0.5167 + l) * ahght);
-			cairo_curve_to(c, 0.4 * awdth, (0.5367 + l) * ahght, 0.5 * awdth, (0.5967 + l) * ahght, 0.6 * awdth, (0.4867 + l) * ahght);
-			cairo_curve_to(c, 0.75 * awdth, (0.3267 + l) * ahght, 0.85 * awdth, (0.3867 + l) * ahght, 1.0 * awdth, (0.3867 + l) * ahght);
-			cairo_line_to(c, fp, 1.0 * ahght);
-			cairo_line_to(c, sp, 1.0 * ahght);
-			cairo_close_path(c);
-			cairo_set_source_rgba(c, r - p, g - p, b - p, a);
-			cairo_fill(c);
-		}
-		i = 0;
-		for (i = 0; i < 130; i++) {
-			double l = 0.00333 * i;
-			double q = 0.0037 * i;
-			cairo_move_to(c, sp, (0.6667 + l) * ahght);
-			cairo_curve_to(c, 0.22 * awdth, (0.7667 + l) * ahght, 0.33 * awdth, (0.8067 + l) * ahght, 0.55 * awdth, (0.7167 + l) * ahght);
-			cairo_curve_to(c, 0.7 * awdth, (0.6367 + l) * ahght, 0.8 * awdth, (0.6167 + l) * ahght, 1.0 * awdth, (0.5667 + l) * ahght);
-			cairo_line_to(c, fp, 1.0 * ahght);
-			cairo_line_to(c, sp, 1.0 * ahght);
-			cairo_close_path(c);
-			cairo_set_source_rgba(c, r - q, g - q, b - q, a);
-			cairo_fill(c);
-		} 
+		paint_foreground(c, aspect, wdth, hght, r, g, b, a);
 	} else if (strcmp(name, "desert-moonrise-dvdlabel") == 0) {
 		pat = lpattern(20.0, wdth / 2, hght, 0.45, 0.405, 0.217, 0.115, 0.315, 0.127, 0.0555, 1.0, 0);
 		cairo_move_to(c, 0.0, 0.5 * hght);
@@ -739,6 +780,8 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_set_source(c, pat);
 		cairo_fill(c);
 		cairo_pattern_destroy(pat);
+	} else if (strcmp(name, "desert-moonrise-wikibanner") == 0) {
+		paint_sforeground(c, wdth, hght, r, g, b, a);
 	} /* foreground */
 
 	if (tlabel) {
