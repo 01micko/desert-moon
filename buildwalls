@@ -146,45 +146,60 @@ for e in SXGA VGA wide FHD ; do
 	wide)X=1920 Y=1200 K='500 400';;
 	 FHD)X=1920 Y=1080 K='400 400';;
     esac
-    ./moonwall -x $X -y $Y -L${DISTRO} -c -s "${FONT2} 80" -n ${NAME}${e} -S "$(printf "%b" "\\u$LOGO")" -k"$K" -d ${DISTRO}/walls
+    ./moonwall -x $X -y $Y -L${DISTRO} -c -s "${FONT2} 100" -n ${NAME}${e} -S "$(printf "%b" "\\u$LOGO")" -k"$K" -d ${DISTRO}/walls
 done
 
-# the following needs ffmpeg
 if  [[ "$FF" == 'yes_ffmpeg' ]] ; then
 	type ffmpeg >/dev/null 2>&1 || {
 		echo "no ffmpeg installed" && exit 0
-	}
-	x=1;
+	}	
+	x=0;
 	while [ $x -lt 200 ]; do
-	n=''
-	[ $x -lt 10 ] && n=00
-	[ $x -lt 100 ] && [ $x -ge 10 ] && n=0
-	./moonwall -x1920 -y1080 -s "${FONT2} 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\u$LOGO")" -k'300 400' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -p -d ${DISTRO}/plymouth
-	x=$(($x + 1))
+		n=''
+		[ $x -lt 10 ] && n=00
+		[ $x -lt 100 ] && [ $x -ge 10 ] && n=0
+		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" \
+			-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -d ${DISTRO}/plymouth -p
+		x=$(($x + 1))
 	done
+else
+	x=0;
+	while [ $x -lt 200 ]; do
+		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" \
+			-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -d ${DISTRO}/plymouth -p
+		x=$(($x + 1))
+	done
+fi
 
 	(cd ${DISTRO}/plymouth
 	x=1
 	while [ $x -lt 32 ] ; do 
-		f=${NAME}199.png
-		z=$((199 + $x))
-		cp -f  $f ${f/199/$z}
-		x=$(($x + 1))
+		f=progress-199.png
+	z=$((199 + $x))
+	cp -f  $f ${f/199/$z}
+	x=$(($x + 1))
 	done
 	)
 
 	x=231
 	q=10
 	while [ $x -lt 281 ] ; do 
-		./moonwall -x1920 -y1080 -s "${FONT2} 80" -n ${NAME}${n}${x} -S "$(printf "%b" "\\u$LOGO")" -k'300 400' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e199 -T${VERSION} -t"${FONT1} 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -p -d ${DISTRO}/plymouth
+		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" \
+		-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e199 -T${VERSION} -t"${FONT1} 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -d ${DISTRO}/plymouth -p
 		x=$(($x + 1))
 		q=$(($q + 1))
 	done
 
 
+# the following needs ffmpeg
+if  [[ "$FF" == 'yes_ffmpeg' ]] ; then
+	type ffmpeg >/dev/null 2>&1 || {
+		echo "no ffmpeg installed" && exit 0
+	}
 	(cd ${DISTRO}/plymouth
 	ffmpeg -framerate 16 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p ../${NAME}.mp4 -y
 	)
+
 fi
 
 exit 0
