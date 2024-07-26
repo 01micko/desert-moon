@@ -95,19 +95,6 @@ static const char *get_user_out_file(char *destination) {
 	return out_file;
 }
 
-static cairo_pattern_t *lpattern(int angle, int wdth, int hght, double offset,
-				double r1, double g1, double b1, double r2, 
-				double g2, double b2, double a, int effect) {
-	cairo_pattern_t *linear;
-	linear = cairo_pattern_create_linear(wdth / 2, hght / 2, wdth / 2, hght);
-	cairo_pattern_add_color_stop_rgba(linear,  0.1, r1, g1, b1, a);
-	cairo_pattern_add_color_stop_rgba(linear, offset, r2, g2, b2, a);
-	if (effect == 1) {
-		cairo_pattern_add_color_stop_rgba(linear, 0.9, r1, g1, b1, a);
-	}
-	return linear;
-}
-
 static PangoLayout *hlayout(const char *font, double f_size, cairo_t *c, int wdth, char *label) {
 	PangoLayout *layout;
 	PangoFontDescription *font_description;
@@ -134,10 +121,9 @@ static PangoLayout *hlayout(const char *font, double f_size, cairo_t *c, int wdt
 void pstrcpy(char *buf, int buf_size, const char *str) {
 	int c;
 	char *q = buf;
-
-	if (buf_size <= 0)
+	if (buf_size <= 0) {
 		return;
-
+	}
 	for(;;) {
 		c = *str++;
 		if (c == 0 || q >= buf + buf_size - 1)
@@ -345,7 +331,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			exit (EXIT_FAILURE);
 		}
 	}
-
 	r = atof(red);
 	g = atof(green);
 	b = atof(blue);
@@ -370,7 +355,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		snprintf(destimg, sizeof(destimg), "%s/%s.svg", get_user_out_file(dest), name);
 		cs = cairo_svg_surface_create(destimg, wdth, hght);
 	} else {
-		cs = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wdth, hght); /* CAIRO_FORMAT_RGB16_565  16 bit */
+		cs = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wdth, hght);
 		snprintf(destimg, sizeof(destimg), "%s/%s.png", get_user_out_file(dest), name);
 	}
 	cairo_t *c;
@@ -395,13 +380,15 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 	} else {
 		cairo_rectangle(c, 0, 0, wdth, hght);
 	}
-	if  (flag == 0) {
+	if (flag == 0) {
 		cairo_set_source_rgb(c, 0.0, 0.0, 0.121);
 		cairo_fill(c);
 	}
-	if  (flag == 1) {
+	if (flag == 1) {
 		cairo_pattern_t *pat;
-		pat = lpattern(1.0, wdth / 2, hght, 0.45, 0.305, 0.327, 0.8572, 0.6, 0.407, 0.239, a, 0);
+		pat =  cairo_pattern_create_linear(wdth / 4, hght / 2, wdth / 4, hght);
+		cairo_pattern_add_color_stop_rgba(pat,  0.1,0.305, 0.327, 0.8572, a);
+		cairo_pattern_add_color_stop_rgba(pat, 0.45, 0.6, 0.407, 0.239, a);
 		cairo_set_source(c, pat);
 		cairo_fill(c);
 		cairo_pattern_destroy(pat);
@@ -426,7 +413,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 	 * "loc.conf" can be in cwd, HOME or /etc.
 	 * HOME is searched first, /etc next then cwd as a fallback
 	 * conf = 0 is default and conflicts with rnd = 1, so "-r2" if set this will disable
-	 * sourcing "loc.con" so that the random pattern is printed to stdout which you can
+	 * sourcing "loc.conf" so that the random pattern is printed to stdout which you can
 	 * use to create a new conf.
 	 */
 	if ((rnd < 0) || (rnd > 2)) {
@@ -480,8 +467,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 				break;
 			}
 		}
-
-		double rm = 0.549;//0.549 0.494 0.400
+		double rm = 0.549;
 		double gm = 0.494;
 		double bm = 0.400;
 		double am = 0.980;
@@ -490,8 +476,49 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_fill(c);
 		cairo_arc (c, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii, 0, M_PI * 2);
 		cairo_fill(c);
-		/*cairo_pattern_destroy(pat);*/
 	} /* moon and stars */
+
+	/* sunrise */
+	if (flag == 1) {
+		/* sun */
+		/* pseudo gradient for sun haze */
+		double offset = 0.65;
+		int e = 0;
+		double rr = 0.882;
+		double gg = 0.749;
+		double bb = 0.098;
+		double aa = 0.01;
+		int rad = radii + (0.2 * radii);
+		for (e = 0; e < 60; e++) {
+			cairo_arc (c, (0.5 * wdth) - wz, (0.2 * hght) - hz, rad + ((0.1 * rad) * e) , 0, M_PI * 2);
+			cairo_set_source_rgba(c, rr, gg, bb, aa);
+		cairo_fill(c);
+			aa = aa - (0.0002 * (rad / 100));
+			if (aa == 0.0) {
+			break;
+			}
+		}
+		pat = cairo_pattern_create_radial ((0.5 * wdth) - wz, (0.2 * hght) - hz, 1.10 * radii, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii * 3);
+		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.882, 0.749, 0.098, .1);
+		cairo_pattern_add_color_stop_rgba(pat, offset * 1, 0.019, 0.278, 0.360, 0.1);
+		cairo_set_source(c, pat);
+		cairo_fill(c);
+		cairo_pattern_destroy(pat);
+		pat = cairo_pattern_create_radial ((0.5 * wdth) - wz, (0.2 * hght) - hz, 0.75 * radii, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii + (0.1 * radii));
+		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.784, 0.541, 0.168, 0.1);
+		cairo_pattern_add_color_stop_rgba(pat, offset, 0.882, 0.749, 0.098, 0.1);
+		cairo_set_source(c, pat);
+		cairo_arc (c, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii, 0, M_PI * 2);
+		cairo_fill(c);
+		cairo_pattern_destroy(pat);
+		pat = cairo_pattern_create_radial ((0.5 * wdth) - wz, (0.2 * hght) - hz, 0.75 * radii, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii);
+		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.784, 0.541, 0.168, 1.0);
+		cairo_pattern_add_color_stop_rgba(pat, offset, 0.882, 0.749, 0.098, 0.6);
+		cairo_set_source(c, pat);
+		cairo_arc (c, (0.5 * wdth) - wz, (0.2 * hght) - hz, radii, 0, M_PI * 2);
+		cairo_fill(c);
+		cairo_pattern_destroy(pat);
+	} /* sunset */
 
 	/* eclipe and stars */
 	if (flag == 2) {
@@ -550,51 +577,10 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		cairo_pattern_destroy(pat);
 	} /* eclipse and stars */
 
-	/* sunset */
-	if (flag == 1) {
-		/* sun */
-		double offset = 0.65;
-		int e = 0;
-		double rr = 0.882;
-		double gg = 0.749;
-		double bb = 0.098;
-		double aa = 0.01;
-		int rad = radii + (0.04 * radii);
-		for (e = 0; e < 60; e++) {
-			cairo_arc (c,0.384 * wdth, 0.530 * hght, rad + ((0.05 * rad) * e) , 0, M_PI * 2);
-			cairo_set_source_rgba(c, rr, gg, bb, aa);
-		cairo_fill(c);
-			aa = aa - (0.0002 * (rad / 100));
-			if (aa == 0.0) {
-			break;
-			}
-		}
-		pat = cairo_pattern_create_radial (0.384 * wdth, 0.530 * hght, 1.10 * radii,  0.384 * wdth, 0.530 * hght, radii * 3);
-		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.882, 0.749, 0.098, .1);
-		cairo_pattern_add_color_stop_rgba(pat, offset * 1, 0.019, 0.278, 0.360, 0.1);
-		cairo_set_source(c, pat);
-		cairo_fill(c);
-		cairo_pattern_destroy(pat);
-		pat = cairo_pattern_create_radial (0.384 * wdth, 0.530 * hght, 0.75 * radii,  0.384 * wdth, 0.530 * hght, radii + (0.1 * radii));
-		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.784, 0.541, 0.168, 0.1);
-		cairo_pattern_add_color_stop_rgba(pat, offset, 0.882, 0.749, 0.098, 0.1);
-		cairo_set_source(c, pat);
-		cairo_arc (c, 0.384 * wdth, 0.530 * hght, radii + (0.1 * radii), 0, M_PI * 2);
-		cairo_fill(c);
-		cairo_pattern_destroy(pat);
-		pat = cairo_pattern_create_radial (0.384 * wdth, 0.530 * hght, 0.75 * radii,  0.384 * wdth, 0.530 * hght, radii);
-		cairo_pattern_add_color_stop_rgba(pat, 0.0, 0.784, 0.541, 0.168, 1.0);
-		cairo_pattern_add_color_stop_rgba(pat, offset, 0.882, 0.749, 0.098, 0.6);
-		cairo_set_source(c, pat);
-		cairo_arc (c, 0.384 * wdth, 0.530 * hght, radii, 0, M_PI * 2);
-		cairo_fill(c);
-		cairo_pattern_destroy(pat);
-	} /* sunset */
-	
 	if (strcmp(name, "desert-moonrise-sticker") == 0) {
 		paint_sforeground(c, wdth, hght, r, g, b, a);
 	}
-	
+
 	/* text for main label */
 	if (label) {
 		int msg_len = strlen(label);
@@ -709,7 +695,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			yg = atof(ygreen);
 			yb = atof(yblue);
 			ya = atof(yalpha);
-			
 			char *sfontfam;
 			char *sfontsz;
 			char *p = strrchr(sfont, ' ');
@@ -752,7 +737,6 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 				pango_layout_set_width(slayout, wrect * PANGO_SCALE);
 				xsposi = (wdth / 2) - (wrect / 2);
 				ysposi = (hght / 2) + (hrect / 2);
-		
 			} else { /* fallback */
 				xsposi = wdth / 2;
 				ysposi = (3 * hght / 7) + sfont_sz + 10;
@@ -771,7 +755,9 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 		aspect = (double)wdth / (double)hght;
 		paint_foreground(c, aspect, wdth, hght, r, g, b, a);
 	} else if (strcmp(name, "desert-moonrise-dvdlabel") == 0) {
-		pat = lpattern(20.0, wdth / 2, hght, 0.45, 0.405, 0.217, 0.115, 0.315, 0.127, 0.0555, 1.0, 0);
+		pat =  cairo_pattern_create_linear(wdth / 2, hght / 2, wdth / 2, hght);
+		cairo_pattern_add_color_stop_rgba(pat,  0.1, 0.405, 0.217, 0.115, a);
+		cairo_pattern_add_color_stop_rgba(pat,  0.45, 0.315, 0.127, 0.0555, a);
 		cairo_move_to(c, 0.0, 0.5 * hght);
 		cairo_curve_to(c, 0.25 * wdth, 0.5167 * hght, 0.36 * wdth, 0.667 * hght, 0.6 * wdth, 0.55 * hght);
 		cairo_curve_to(c, 0.69 * wdth, 0.4967 * hght, 0.79 * wdth, 0.4767 * hght, wdth, 0.5 * hght);
@@ -803,7 +789,7 @@ void paint_img(char *label, const char *font, char *slabel, const char *sfont, c
 			if (zresult < 4) {
 				fprintf(stderr,"ERROR: less than 4 color aguments!\n");
 				exit (EXIT_FAILURE);
-			}	
+			}
 		}
 		zr = atof(zred);
 		zg = atof(zgreen);
