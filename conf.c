@@ -31,8 +31,6 @@
 #define MYHOME      getenv("HOME")
 
 char colorstring[34];
-//const char *myhome = "HOME";
-//const char *home = getenv(myhome);
 
 char *split_string(char *var) {
 	char *buf = var;
