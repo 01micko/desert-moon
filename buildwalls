@@ -16,10 +16,30 @@
 
 set -e
 
+# example configuration for slackware
+# FONT1xx='CMU Typewriter Text'
+# FONT2xx=''
+# LOGOxx='f125'
+# LOGOCOL='0.035 0.117 0.384 0.8'
+# LOGOCOL=x=$LOGOCOL
+# sOPT=-b1
+# URL=slackware.com
+# SPC=120
+# S1="Bob knows best"
+# S2="got slack?"
+
+
 FONT1xx=''
 FONT2xx=''
 LOGOxx=''
-
+LOGOCOL='0.780 00 0.211 1.0'
+LOGOCOLx='1.0 1.0 1.0 0.5'
+# optional
+sOPT=''
+URL=https://deb.li/trixie
+SPC=0
+S1="the universal operating system"
+S2="trixie"
 # these MUST be set
 DISTRO="debian"
 VERSION=13
@@ -85,6 +105,7 @@ LOGO=f10a
 
 checkfont "$FONT1" || exit 1
 checkfont "$FONT2" x || exit 1
+[ -z "$SPC" ] && SPC=0
 
 echo -e "Hello $USER, using font $FONT1 for text, $FONT2 for logos
 \twith $DISTRO distro version $VERSION"
@@ -94,45 +115,45 @@ rm -rf ${DISTRO}/
 mkdir -p ${DISTRO}/plymouth ${DISTRO}/walls
 
 ./moonwall -x800 -y75 -d${DISTRO} -L"${DISTRO} ${VERSION}"  -s"${FONT2} 30" -S "$(printf "%b" "\\u$LOGO")" \
-  -j'240 6' -k'440 3' -l"${FONT1} 30" -n ${NAME}-installer -e80 -p
+  -j'240 6' -k"$(($SPC + 440)) 3" -l"${FONT1} 30" -n ${NAME}-installer -e80 -p $sOPT
 
 ./moonwall -x1920 -y120 -d${DISTRO}  -s "${FONT2} 50" -S "$(printf "%b" "\\u$LOGO")" -k'680 -20' \
   -n ${NAME}-banner -e46 -l"${FONT1} 40" -L "${DISTRO}" -j'1100 -20'  -t"${FONT1} 20" \
-  -m"1224 -5"-Z"0.9 0.9 0.9 0.65" -T"the universal operating system"
+  -m"1224 -5"-Z"$LOGOCOL" -T"$S1" $sOPT
 
 ./moonwall -x720 -y340 -d${DISTRO} -s "${FONT2} 50" -S "$(printf "%b" "\\u$LOGO")" -k'100 60' \
   -n ${NAME}-wikibanner -e130 -l"${FONT1} 26" -L "${DISTRO} ${VERSION}" -j'280 140' \
-  -T"the universal operating system" -t"${FONT1} 20" -m"210 240" -Z"0.9 0.9 0.9 0.5"
+  -T"$S1" -t"${FONT1} 20" -m"210 240" -Z"0.9 0.9 0.9 0.5" $sOPT
 
 ./moonwall -x720 -y340 -d${DISTRO} -s "${FONT2} 50" -S "$(printf "%b" "\\u$LOGO")" -k'100 60' \
   -n ${NAME}-blogbanner -e130 -l"${FONT1} 26" -L "${DISTRO} ${VERSION}" -j'280 140' \
-  -T"https://deb.li/trixie" -t"${FONT1} 20" -m"250 240" -Z"0.9 0.9 0.9 0.5"
+  -T"$URL" -t"${FONT1} 20" -m"250 240" -Z"0.9 0.9 0.9 0.5" $sOPT
 
 ./moonwall -x720 -y180 -d${DISTRO} -s "${FONT2} 70" -S "$(printf "%b" "\\u$LOGO")" -k'80 40' \
-  -Y"0.780 0.0 0.211 1.0" -n ${NAME}-sticker -e120 -l"${FONT1} 100" -L "${DISTRO} ${VERSION}" -j'220 60' \
-  -X"0.9 0.9 0.9 0.7" -T"trixie" -t"${FONT1} 34" -m"550 150" -Z"0.9 0.9 0.9 0.5"
+  -Y"$LOGOCOL" -n ${NAME}-sticker -e120 -l"${FONT1} 100" -L "${DISTRO} ${VERSION}" -j'220 60' \
+  -X"0.9 0.9 0.9 0.7" -T"$S2" -t"${FONT1} 34" -m"$((550 - $SPC)) 150" -Z"0.9 0.9 0.9 0.5" $sOPT
 
 ./moonwall -x600 -y600 -d${DISTRO} -s "${FONT2} 60" -S "$(printf "%b" "\\u$LOGO")" -k'100 120' \
   -n ${NAME}-dvdlabel -e100 -l"${FONT1} 36" -L "${DISTRO} ${VERSION}" -j'240 190' \
-  -T"the universal operating system" -t"${FONT1} 20" -m"180 460" -Z"0.9 0.9 0.9 0.5"
+  -T"$S1" -t"${FONT1} 20" -m"180 460" -Z"0.9 0.9 0.9 0.5" $sOPT
 
 ./moonwall -x1920 -y1080 -d${DISTRO} -s "${FONT2} 60" -S "$(printf "%b" "\\u$LOGO")" -k'1160 320' \
   -n ${NAME}-login -e100 -L " " \
-  -T"${DISTRO}" -t"${FONT1} 80" -m"460 900" -Z"0.9 0.9 0.9 0.5"
+  -T"${DISTRO}" -t"${FONT1} 80" -m"460 900" -Z"0.9 0.9 0.9 0.5" $sOPT
 
 ./moonwall -x1000 -y1000 -d${DISTRO} -s "${FONT2} 800" -S "$(printf "%b" "\\u$LOGO")" -k'100 20' \
   -Y"0.96 0.96 0.96 0.4" -n ${NAME}-tshirt -e80 -l"${FONT1} 120" -L "${DISTRO}" -j'350 540' \
-  -T"trixie" -t"${FONT1} 50" -m"700 700" -Z"0.780 0.0 0.211 1.0"
+  -T"$S2" -t"${FONT1} 50" -m"700 700" -Z"$LOGOCOL" $sOPT
 
 ./moonwall -x640 -y480 -d${DISTRO} -s "${FONT2} 40" -S "$(printf "%b" "\\u$LOGO")" -k'460 120' \
   -n ${NAME}-grub-in -e100 -L " " \
-  -T"${DISTRO}" -t"${FONT1} 22" -m"300 300" -Z"0.9 0.9 0.9 0.5" -p
+  -T"${DISTRO}" -t"${FONT1} 22" -m"300 300" -Z"${LOGOCOL}" -p $sOPT
 cat ${DISTRO}/${NAME}-grub-in.png|pngtopnm|pnmquant 65536|pnmtopng > ${DISTRO}/${NAME}-grub.png && echo ${NAME}-grub.png created || echo ${NAME}-grub.png failed
 
-./moonwall -x640 -y300 -s "${FONT2} 80" -d${DISTRO} -n ${NAME}-syslinux-in -S "$(printf "%b" "\\u$LOGO")" -k'120 60' -L" " -p
+./moonwall -x640 -y300 -s "${FONT2} 80" -d${DISTRO} -n ${NAME}-syslinux-in -S "$(printf "%b" "\\u$LOGO")" -k'120 60' -L" " -p $sOPT
 cat ${DISTRO}/${NAME}-syslinux-in.png|pngtopnm|pnmquant 65536|pnmtopng > ${DISTRO}/${NAME}-syslinux.png && echo ${NAME}-syslinux.png created || echo ${NAME}-syslinux.png failed
 
-./moonwall -x640 -y300 -s "${FONT2} 80" -d${DISTRO} -n ${NAME}-isolinux-in -S "$(printf "%b" "\\u$LOGO")" -k'120 60' -L" " -p
+./moonwall -x640 -y300 -s "${FONT2} 80" -d${DISTRO} -n ${NAME}-isolinux-in -S "$(printf "%b" "\\u$LOGO")" -k'120 60' -L" " -p $sOPT
 cat ${DISTRO}/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|ppmtolss16 > ${DISTRO}/${NAME}-isolinux.lss && echo ${NAME}-isolinux.lss created || echo ${NAME}-isolinux.lss failed
 cat ${DISTRO}/${NAME}-isolinux-in.png|pngtopnm|pnmquant 16|pnmtopng >  ${DISTRO}/${NAME}-isolinux.png
 
@@ -146,7 +167,7 @@ for e in SXGA VGA wide FHD ; do
 	wide)X=1920 Y=1200 K='500 400';;
 	 FHD)X=1920 Y=1080 K='400 400';;
     esac
-    ./moonwall -x $X -y $Y -L${DISTRO} -c -s "${FONT2} 100" -n ${NAME}${e} -S "$(printf "%b" "\\u$LOGO")" -k"$K" -d ${DISTRO}/walls
+    ./moonwall -x $X -y $Y -L${DISTRO} -l"${FONT1} 30" -c -s "${FONT2} 100" -n ${NAME}${e} -S "$(printf "%b" "\\u$LOGO")" -k"$K" -d ${DISTRO}/walls $sOPT
 done
 
 if  [[ "$FF" == 'yes_ffmpeg' ]] ; then
@@ -158,15 +179,15 @@ if  [[ "$FF" == 'yes_ffmpeg' ]] ; then
 		n=''
 		[ $x -lt 10 ] && n=00
 		[ $x -lt 100 ] && [ $x -ge 10 ] && n=0
-		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" \
-			-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -d ${DISTRO}/plymouth -p
+		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" -Y"${LOGOCOLx}"\
+			-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -d ${DISTRO}/plymouth -p $sOPT
 		x=$(($x + 1))
 	done
 else
 	x=0;
 	while [ $x -lt 200 ]; do
-		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" \
-			-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -d ${DISTRO}/plymouth -p
+		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" -Y"${LOGOCOLx}"\
+			-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e${x} -d ${DISTRO}/plymouth -p $sOPT
 		x=$(($x + 1))
 	done
 fi
@@ -184,8 +205,8 @@ fi
 	x=231
 	q=10
 	while [ $x -lt 281 ] ; do 
-		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" \
-		-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e199 -T${VERSION} -t"${FONT1} 60" -m"700 840" -Z"1.0 1.0 1.0 0.${q}" -d ${DISTRO}/plymouth -p
+		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" -Y"${LOGOCOLx}"\
+		-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e199 -T${VERSION} -t"${FONT1} 60" -m"$(($SPC + 700)) 840" -Z"1.0 1.0 1.0 0.${q}" -d ${DISTRO}/plymouth -p $sOPT
 		x=$(($x + 1))
 		q=$(($q + 1))
 	done
