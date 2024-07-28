@@ -21,12 +21,44 @@ set -e
 # FONT2xx=''
 # LOGOxx='f125'
 # LOGOCOL='0.035 0.117 0.384 0.8'
-# LOGOCOL=x=$LOGOCOL
+# LOGOCOLx=$LOGOCOL
 # sOPT=-b1
 # URL=slackware.com
 # SPC=120
 # S1="Bob knows best"
 # S2="got slack?"
+# DISTRO="slackware"
+# VERSION=15.0
+
+# example configuration for bunsen
+# FONT1xx='Nimbus Sans'
+# FONT2xx='labwcmoon'
+# FONT3='Nimbus Sans Narrow'
+# LOGOxx='e900'
+# LOGOCOL='1.0 1.0 1.0 0.5'
+# LOGOCOLx=$LOGOCOL
+# sOPT=''
+# URL=https://bunsenlabs.org
+# SPC='13'
+# S1="what's your hypothesis?"
+# S2="bunsenlabs"
+# DISTRO="bunsen"
+# VERSION=labs
+
+# example configuration for arch
+# FONT1xx='DejaVu Sans Condensed'
+# FONT2xx=''
+# FONT3='DejaVu Sans Light'
+# LOGOxx='f105'
+# LOGOCOL='0.086 0.556 0.792 0.8'
+# LOGOCOLx=$LOGOCOL
+# sOPT=''
+# URL=https://archlinux.org
+# SPC=-60
+# S1="Keep it simple, stupid"
+# S2="got arch?"
+# DISTRO="arch"
+# VERSION=linux
 
 
 FONT1xx=''
@@ -106,6 +138,7 @@ LOGO=f10a
 checkfont "$FONT1" || exit 1
 checkfont "$FONT2" x || exit 1
 [ -z "$SPC" ] && SPC=0
+[ -z "$FONT3" ] && FONT3=$FONT1
 
 echo -e "Hello $USER, using font $FONT1 for text, $FONT2 for logos
 \twith $DISTRO distro version $VERSION"
@@ -205,8 +238,8 @@ fi
 	x=231
 	q=10
 	while [ $x -lt 281 ] ; do 
-		./moonwall -x1920 -y1080 -s "${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" -Y"${LOGOCOLx}"\
-		-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -e199 -T${VERSION} -t"${FONT1} 60" -m"$(($SPC + 700)) 840" -Z"1.0 1.0 1.0 0.${q}" -d ${DISTRO}/plymouth -p $sOPT
+		./moonwall -x1920 -y1080 -s"${FONT2} 100" -n progress-${n}${x} -S "$(printf "%b" "\\u$LOGO")" -Y"${LOGOCOLx}"\
+		-k'600 700' -l"${FONT1} 60" -L${DISTRO} -j'520 840' -t"$FONT3" -e199 -t"$FONT3" -T${VERSION} -t"${FONT3} 60" -m"$(($SPC + 700)) 840" -Z"1.0 1.0 1.0 0.${q}" -d ${DISTRO}/plymouth -p $sOPT
 		x=$(($x + 1))
 		q=$(($q + 1))
 	done
