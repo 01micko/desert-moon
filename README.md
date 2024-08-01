@@ -1,5 +1,5 @@
 # desert-moon
-A program to produce a suite of images for boot screens, wallpapers, website banners and more.
+A program to produce a suite of images for boot screens, wallpapers, plymouth, website banners and more.
 
 ### teaser
 
@@ -13,12 +13,11 @@ DebianArt debian 13 art submission
 
 [Desert Moonrise](https://wiki.debian.org/DebianArt/Themes/desert-moonrise)
 
-### still WIP
+[Plymouth repository](https://github.com/01micko/desert-moonrise-plymouth) - tested
+working at FHD and 1366x768 resolutions.
 
 This program should not be considered stable. While it shouldn't destroy anything
 there's no warranty under the terms of the GPL.
-
-More to come.
 
 ### why?
 
@@ -46,7 +45,7 @@ If built without error run:
 
 Everything will be located in the subdir `debian/`
 
-The script `buildwalls` can be edited to add custom fonts and tweaking of the name and logo.
+The script `buildwalls` can be edited to add custom fonts and tweaking of the name, distro and logo.
 
 ### dependencies
 
@@ -59,7 +58,16 @@ The script `buildwalls` can be edited to add custom fonts and tweaking of the na
  - ffmpeg (for animation - optional)
  - rsvg
  - Poppl-Laudatio or Prociono or another Serif font
- - [font-logos](https://github.com/Lukas-W/font-logos) or perhaps fontawesome
+ - [font-logos](https://github.com/Lukas-W/font-logos) or perhaps fontawesome or
+ other icon font.
+
+### known issues
+
+On some systems, the font logo shows up as the hex code when running `buildwalls`. There is
+a work around to alleviate this in a second script called `buildwalls-alt` that has the icon
+glyphs pasted into place. Not all distros are covered of course but you can paste them in
+yourself if you open up a word processor and use your icon font of choice in that and paste
+appropriate characters into the script.
 
 ### To Do
 
